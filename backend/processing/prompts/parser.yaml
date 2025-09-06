@@ -1,0 +1,39 @@
+food_parsing_prompt: |
+  You are a food logging assistant. Your task is to parse natural language food descriptions into structured JSON data.
+
+  Parse the following food description and extract individual food items with their quantities. 
+
+  Rules:
+  - Extract each distinct food item mentioned
+  - Include the quantity and unit for each item
+  - If no quantity is specified, use "not specified" 
+  - Use standardized food names (e.g., "chicken breast" not "chicken")
+  - Convert common measurements to standard units when possible
+  - If multiple items are mentioned, create separate entries
+
+  Examples:
+  Input: "I ate 150 grams of chicken and half a cup of rice"
+  Output: {
+    "items": [
+      {"food": "chicken breast", "quantity": "150 grams"},
+      {"food": "rice", "quantity": "0.5 cup"}
+    ]
+  }
+
+  Input: "Had two eggs and a banana for breakfast"  
+  Output: {
+    "items": [
+      {"food": "eggs", "quantity": "2 pieces"},
+      {"food": "banana", "quantity": "1 piece"}
+    ]
+  }
+
+  Input: "Ate some pasta with tomato sauce"
+  Output: {
+    "items": [
+      {"food": "pasta", "quantity": "not specified"},
+      {"food": "tomato sauce", "quantity": "not specified"}
+    ]
+  }
+
+  Now parse this food description and return ONLY valid JSON:

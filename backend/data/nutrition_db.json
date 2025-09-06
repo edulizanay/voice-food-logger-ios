@@ -1,0 +1,80 @@
+{
+  "chicken breast": {
+    "calories": 165,
+    "protein_g": 31,
+    "carbs_g": 0,
+    "fat_g": 3.6
+  },
+  "chicken": {
+    "calories": 165,
+    "protein_g": 31,
+    "carbs_g": 0,
+    "fat_g": 3.6
+  },
+  "ground beef": {
+    "calories": 250,
+    "protein_g": 26,
+    "carbs_g": 0,
+    "fat_g": 15
+  },
+  "whey protein": {
+    "calories": 120,
+    "protein_g": 25,
+    "carbs_g": 3,
+    "fat_g": 1
+  },
+  "rice": {
+    "calories": 130,
+    "protein_g": 2.7,
+    "carbs_g": 28,
+    "fat_g": 0.3
+  },
+  "brown rice": {
+    "calories": 112,
+    "protein_g": 2.6,
+    "carbs_g": 22,
+    "fat_g": 0.9
+  },
+  "yogurt": {
+    "calories": 59,
+    "protein_g": 10,
+    "carbs_g": 3.6,
+    "fat_g": 0.4
+  },
+  "banana": {
+    "calories": 89,
+    "protein_g": 1.1,
+    "carbs_g": 23,
+    "fat_g": 0.3
+  },
+  "scallops": {
+    "calories": 137,
+    "protein_g": 24,
+    "carbs_g": 6.3,
+    "fat_g": 1.2
+  },
+  "onion": {
+    "calories": 40,
+    "protein_g": 1.1,
+    "carbs_g": 9.3,
+    "fat_g": 0.1
+  },
+  "eggs": {
+    "calories": 155,
+    "protein_g": 13,
+    "carbs_g": 1.1,
+    "fat_g": 11
+  },
+  "egg": {
+    "calories": 78,
+    "protein_g": 6.5,
+    "carbs_g": 0.6,
+    "fat_g": 5.3
+  },
+  "pasta": {
+    "calories": 220,
+    "protein_g": 8,
+    "carbs_g": 44,
+    "fat_g": 1.1
+  }
+}

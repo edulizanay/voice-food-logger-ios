@@ -1,0 +1,48 @@
+{
+  "" : {
+    "diagnostics" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/VoiceFoodLogger-master.dia",
+    "emit-module-dependencies" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/VoiceFoodLogger-master-emit-module.d",
+    "emit-module-diagnostics" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/VoiceFoodLogger-master-emit-module.dia",
+    "swift-dependencies" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/VoiceFoodLogger-master.swiftdeps"
+  },
+  "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/VoiceFoodLogger/AudioRecorder.swift" : {
+    "const-values" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/AudioRecorder.swiftconstvalues",
+    "dependencies" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/AudioRecorder.d",
+    "diagnostics" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/AudioRecorder.dia",
+    "index-unit-output-path" : "/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/AudioRecorder.o",
+    "llvm-bc" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/AudioRecorder.bc",
+    "object" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/AudioRecorder.o",
+    "swift-dependencies" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/AudioRecorder.swiftdeps",
+    "swiftmodule" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/AudioRecorder~partial.swiftmodule"
+  },
+  "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/VoiceFoodLogger/ContentView.swift" : {
+    "const-values" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/ContentView.swiftconstvalues",
+    "dependencies" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/ContentView.d",
+    "diagnostics" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/ContentView.dia",
+    "index-unit-output-path" : "/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/ContentView.o",
+    "llvm-bc" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/ContentView.bc",
+    "object" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/ContentView.o",
+    "swift-dependencies" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/ContentView.swiftdeps",
+    "swiftmodule" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/ContentView~partial.swiftmodule"
+  },
+  "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/VoiceFoodLogger/VoiceFoodLoggerApp.swift" : {
+    "const-values" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/VoiceFoodLoggerApp.swiftconstvalues",
+    "dependencies" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/VoiceFoodLoggerApp.d",
+    "diagnostics" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/VoiceFoodLoggerApp.dia",
+    "index-unit-output-path" : "/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/VoiceFoodLoggerApp.o",
+    "llvm-bc" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/VoiceFoodLoggerApp.bc",
+    "object" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/VoiceFoodLoggerApp.o",
+    "swift-dependencies" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/VoiceFoodLoggerApp.swiftdeps",
+    "swiftmodule" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/VoiceFoodLoggerApp~partial.swiftmodule"
+  },
+  "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "const-values" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftconstvalues",
+    "dependencies" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/GeneratedAssetSymbols.d",
+    "diagnostics" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/GeneratedAssetSymbols.dia",
+    "index-unit-output-path" : "/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "swift-dependencies" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
+    "swiftmodule" : "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/build/Build/Intermediates.noindex/VoiceFoodLogger.build/Debug-iphonesimulator/VoiceFoodLogger.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
+  }
+}

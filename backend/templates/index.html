@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Food Logger</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .recording-section {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px;
+            background-color: #fafafa;
+            border-radius: 12px;
+        }
+        
+        .record-button {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: none;
+            background-color: #FF3B30;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .record-button.recording {
+            background-color: #FF6B6B;
+            transform: scale(1.1);
+        }
+        
+        .record-button.processing {
+            background-color: #FFA500;
+            cursor: not-allowed;
+        }
+        
+        .record-button:hover:not(.processing) {
+            background-color: #E02B20;
+        }
+        
+        .timer, .status {
+            margin: 10px 0;
+            font-size: 16px;
+            min-height: 20px;
+        }
+        
+        .status.success { color: #28a745; }
+        .status.error { color: #dc3545; }
+        
+        .instruction {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .permission-note {
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+        }
+        
+        .results, .today-entries, .daily-summary {
+            margin-top: 30px;
+        }
+        
+        .result-item, .entry {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .entry-time {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .food-item {
+            background-color: white;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 4px;
+        }
+        
+        .food-name {
+            font-weight: 600;
+            color: #333;
+            margin-right: 10px;
+        }
+        
+        .food-quantity {
+            color: #666;
+        }
+        
+        .macro-table {
+            margin-top: 8px;
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        
+        .macro-table th, .macro-table td {
+            padding: 4px 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        .macro-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .daily-summary {
+            padding: 20px;
+            background-color: #e3f2fd;
+            border-radius: 8px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .daily-summary h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+        
+        .daily-summary .macro-table th {
+            background-color: #2196f3;
+            color: white;
+        }
+        
+        .daily-summary .macro-table td {
+            font-weight: 500;
+        }
+        
+        .transcription {
+            font-style: italic;
+            color: #666;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Voice Food Logger</h1>
+        
+        <div class="recording-section">
+            <div class="instruction" id="instruction">Click the button and speak your food intake</div>
+            
+            <button class="record-button" id="recordBtn">🎤</button>
+            <button class="record-button" id="stopBtn" style="display: none;">⏹️</button>
+            
+            <div class="timer" id="timer"></div>
+            <div class="permission-note" id="permissionNote">*Microphone permission required</div>
+            <div class="status" id="status"></div>
+        </div>
+        
+        <div class="results" id="results"></div>
+        
+        <div class="today-entries">
+            <h3>Today's Food Entries</h3>
+            <div id="todayEntries">
+                {% if entries %}
+                    {% for entry in entries %}
+                    <div class="entry">
+                        <div class="entry-time">{{ entry['timestamp'] }}</div>
+                        <div class="food-items">
+                            {% for item in entry['items'] %}
+                            <div class="food-item">
+                                <span class="food-name">{{ item['food'] }}</span>
+                                <span class="food-quantity">{{ item['quantity'] }}</span>
+                                {% if item.get('macros') %}
+                                <table class="macro-table">
+                                    <tr>
+                                        <th>Calories</th>
+                                        <th>Protein (g)</th>
+                                        <th>Carbs (g)</th>
+                                        <th>Fat (g)</th>
+                                    </tr>
+                                    <tr>
+                                        <td>{{ item['macros']['calories'] }}</td>
+                                        <td>{{ item['macros']['protein_g'] }}</td>
+                                        <td>{{ item['macros']['carbs_g'] }}</td>
+                                        <td>{{ item['macros']['fat_g'] }}</td>
+                                    </tr>
+                                </table>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No entries for today yet</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="daily-summary">
+            <h3>📊 Daily Summary</h3>
+            <div id="dailySummary">
+                {% if daily_totals %}
+                <table class="macro-table">
+                    <tr>
+                        <th>Total Calories</th>
+                        <th>Total Protein (g)</th>
+                        <th>Total Carbs (g)</th>
+                        <th>Total Fat (g)</th>
+                    </tr>
+                    <tr>
+                        <td>{{ daily_totals['calories'] }}</td>
+                        <td>{{ daily_totals['protein_g'] }}</td>
+                        <td>{{ daily_totals['carbs_g'] }}</td>
+                        <td>{{ daily_totals['fat_g'] }}</td>
+                    </tr>
+                </table>
+                {% else %}
+                    <p>No nutritional data for today yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const recordBtn = document.getElementById('recordBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const timer = document.getElementById('timer');
+        const instruction = document.getElementById('instruction');
+        const permissionNote = document.getElementById('permissionNote');
+        const status = document.getElementById('status');
+        const results = document.getElementById('results');
+        const todayEntries = document.getElementById('todayEntries');
+        
+        let mediaRecorder;
+        let audioChunks = [];
+        let recording = false;
+        let startTime;
+        let timerInterval;
+
+        // Request microphone access on page load
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                permissionNote.style.display = 'none';
+                instruction.textContent = 'Ready to record!';
+                setupRecording(stream);
+            })
+            .catch(() => {
+                permissionNote.textContent = '*Please allow microphone access and refresh the page';
+                permissionNote.style.color = '#dc3545';
+            });
+
+        function setupRecording(stream) {
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+            
+            mediaRecorder.ondataavailable = event => {
+                if (event.data.size > 0) audioChunks.push(event.data);
+            };
+            
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                uploadAudio(audioBlob);
+                audioChunks = [];
+            };
+        }
+
+        recordBtn.addEventListener('click', startRecording);
+        stopBtn.addEventListener('click', stopRecording);
+
+        function startRecording() {
+            if (!mediaRecorder || recording) return;
+            
+            recording = true;
+            audioChunks = [];
+            
+            recordBtn.style.display = 'none';
+            stopBtn.style.display = 'flex';
+            stopBtn.classList.add('recording');
+            
+            instruction.textContent = 'Recording... Speak your food intake';
+            status.textContent = '';
+            
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 100);
+            
+            mediaRecorder.start();
+        }
+
+        function stopRecording() {
+            if (!recording) return;
+            
+            recording = false;
+            mediaRecorder.stop();
+            
+            stopBtn.style.display = 'none';
+            recordBtn.style.display = 'flex';
+            recordBtn.classList.add('processing');
+            recordBtn.textContent = '⏳';
+            
+            stopBtn.classList.remove('recording');
+            clearInterval(timerInterval);
+            
+            instruction.textContent = 'Processing your recording...';
+            timer.textContent = '';
+            showStatus('info', 'Processing audio...');
+        }
+
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            timer.textContent = `${elapsed}s`;
+        }
+
+        function showStatus(type, message) {
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+
+        async function uploadAudio(audioBlob) {
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'recording.webm');
+            
+            try {
+                const response = await fetch('/upload_audio', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showStatus('success', 'Audio processed successfully!');
+                    displayResults(data);
+                    refreshTodayEntries();
+                    refreshDailySummary();
+                } else {
+                    showStatus('error', `Error: ${data.error}`);
+                }
+                
+            } catch (error) {
+                showStatus('error', `Network error: ${error.message}`);
+            } finally {
+                recordBtn.classList.remove('processing');
+                recordBtn.textContent = '🎤';
+                instruction.textContent = 'Ready to record!';
+            }
+        }
+
+        function displayResults(data) {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'result-item';
+            
+            let html = `<div class="transcription">"${data.transcription}"</div><div class="food-items">`;
+            
+            data.items.forEach(item => {
+                html += `<div class="food-item">
+                    <span class="food-name">${item.food}</span>
+                    <span class="food-quantity">${item.quantity}</span>`;
+                
+                if (item.macros) {
+                    html += createMacroTable(item.macros);
+                }
+                
+                html += '</div>';
+            });
+            
+            html += '</div>';
+            resultDiv.innerHTML = html;
+            results.insertBefore(resultDiv, results.firstChild);
+        }
+
+        function createMacroTable(macros) {
+            return `<table class="macro-table">
+                <tr>
+                    <th>Calories</th>
+                    <th>Protein (g)</th>
+                    <th>Carbs (g)</th>
+                    <th>Fat (g)</th>
+                </tr>
+                <tr>
+                    <td>${macros.calories}</td>
+                    <td>${macros.protein_g}</td>
+                    <td>${macros.carbs_g}</td>
+                    <td>${macros.fat_g}</td>
+                </tr>
+            </table>`;
+        }
+
+        function refreshTodayEntries() {
+            fetch('/entries')
+                .then(response => response.json())
+                .then(entries => {
+                    if (entries.length === 0) {
+                        todayEntries.innerHTML = '<p>No entries for today yet</p>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    entries.forEach(entry => {
+                        html += `<div class="entry">
+                            <div class="entry-time">${entry.timestamp}</div>
+                            <div class="food-items">`;
+                        
+                        entry.items.forEach(item => {
+                            html += `<div class="food-item">
+                                <span class="food-name">${item.food}</span>
+                                <span class="food-quantity">${item.quantity}</span>`;
+                            
+                            if (item.macros) {
+                                html += createMacroTable(item.macros);
+                            }
+                            
+                            html += '</div>';
+                        });
+                        
+                        html += '</div></div>';
+                    });
+                    
+                    todayEntries.innerHTML = html;
+                });
+        }
+        
+        function refreshDailySummary() {
+            fetch('/daily_totals')
+                .then(response => response.json())
+                .then(totals => {
+                    const dailySummary = document.getElementById('dailySummary');
+                    
+                    if (totals.calories === 0 && totals.protein_g === 0 && totals.carbs_g === 0 && totals.fat_g === 0) {
+                        dailySummary.innerHTML = '<p>No nutritional data for today yet</p>';
+                    } else {
+                        dailySummary.innerHTML = createMacroTable(totals);
+                    }
+                })
+                .catch(error => console.error('Error fetching daily totals:', error));
+        }
+    </script>
+</body>
+</html>

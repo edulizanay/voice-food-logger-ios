@@ -1,0 +1,96 @@
+{
+  "source": "/Users/eduardolizana/Documents/Github/VoiceFoodLogger/VoiceFoodLogger/ContentView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Microphone Permission Required",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 110
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap to stop recording",
+        "location": {
+          "startingColumn": 50,
+          "startingLine": 102
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap to start recording",
+        "location": {
+          "startingColumn": 76,
+          "startingLine": 102
+        }
+      },
+      {
+        "comment": "",
+        "key": "Voice Food Logger",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 19
+        }
+      },
+      {
+        "comment": "",
+        "key": "Tap to record your food intake",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 24
+        }
+      },
+      {
+        "comment": "",
+        "key": "Recording...",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 43
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ready to Record",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 55
+        }
+      },
+      {
+        "comment": "",
+        "key": "00:00.0",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 59
+        }
+      },
+      {
+        "comment": "",
+        "key": "Settings",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 111
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 116
+        }
+      },
+      {
+        "comment": "",
+        "key": "Please enable microphone access in Settings to record audio.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 118
+        }
+      }
+    ]
+  },
+  "version": 1
+}
