@@ -46,7 +46,7 @@ struct ResultsView: View {
                     
                     // Food Items Section
                     VStack(alignment: .leading, spacing: 12) {
-                        Label("Food Items (\\(foodItems.count))", systemImage: "list.bullet")
+                        Label("Food Items (\(foodItems.count))", systemImage: "list.bullet")
                             .font(.headline)
                             .foregroundColor(.green)
                         
@@ -131,21 +131,21 @@ struct FoodItemRow: View {
             
             if let macros = item.macros {
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text("\\(macros.calories) cal")
+                    Text("\(macros.calories) cal")
                         .font(.caption)
                         .fontWeight(.semibold)
                         .foregroundColor(.primary)
                     
                     HStack(spacing: 8) {
-                        Text("P: \\(macros.proteinG, specifier: \"%.1f\")g")
+                        Text("P: \(macros.proteinG, specifier: "%.1f")g")
                             .font(.caption2)
                             .foregroundColor(.blue)
                         
-                        Text("C: \\(macros.carbsG, specifier: \"%.1f\")g")
+                        Text("C: \(macros.carbsG, specifier: "%.1f")g")
                             .font(.caption2)
                             .foregroundColor(.orange)
                         
-                        Text("F: \\(macros.fatG, specifier: \"%.1f\")g")
+                        Text("F: \(macros.fatG, specifier: "%.1f")g")
                             .font(.caption2)
                             .foregroundColor(.green)
                     }
@@ -170,7 +170,7 @@ struct MacrosSummaryView: View {
                 Text("Total Calories")
                     .font(.headline)
                 Spacer()
-                Text("\\(macros.calories)")
+                Text("\(macros.calories)")
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(.primary)
@@ -199,7 +199,7 @@ struct MacroView: View {
     
     var body: some View {
         VStack(spacing: 4) {
-            Text("\\(value, specifier: \"%.1f\")")
+            Text("\(value, specifier: "%.1f")")
                 .font(.title3)
                 .fontWeight(.bold)
                 .foregroundColor(color)
