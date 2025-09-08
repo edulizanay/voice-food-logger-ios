@@ -398,6 +398,7 @@
 				DEVELOPMENT_TEAM = 8YY58Z739S;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = FitMe;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app needs access to the microphone to record your food descriptions.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -427,6 +428,7 @@
 				DEVELOPMENT_TEAM = 8YY58Z739S;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = FitMe;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app needs access to the microphone to record your food descriptions.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

@@ -240,9 +240,12 @@ def delete_entry(entry_id: str) -> bool:
                 return False
                 
             entries = data['entries']
-            # Find and remove entry with matching ID
+            # Find and remove entry with matching ID or timestamp (for legacy entries without IDs)
             original_count = len(entries)
-            entries = [entry for entry in entries if entry.get('id') != entry_id]
+            entries = [entry for entry in entries if not (
+                entry.get('id') == entry_id or 
+                (entry.get('id') is None and entry.get('timestamp') == entry_id)
+            )]
             
             if len(entries) == original_count:
                 return False  # Entry not found
@@ -258,7 +261,7 @@ def delete_entry(entry_id: str) -> bool:
             with open(filepath, 'w') as file:
                 json.dump(updated_data, file, indent=2)
             
-            print(f"Deleted entry with ID {entry_id}")
+            print(f"Deleted entry with ID/timestamp {entry_id}")
             return True
             
         except json.JSONDecodeError:
@@ -291,9 +294,9 @@ def update_entry_quantity(entry_id: str, new_quantity: str) -> bool:
             entries = data['entries']
             entry_found = False
             
-            # Find and update entry with matching ID
+            # Find and update entry with matching ID or timestamp (for legacy entries without IDs)
             for entry in entries:
-                if entry.get('id') == entry_id:
+                if entry.get('id') == entry_id or (entry.get('id') is None and entry.get('timestamp') == entry_id):
                     if 'items' in entry and len(entry['items']) > 0:
                         # Update quantity of the first (and typically only) item
                         entry['items'][0]['quantity'] = new_quantity
