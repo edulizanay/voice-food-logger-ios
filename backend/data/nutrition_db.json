@@ -76,5 +76,23 @@
     "protein_g": 8,
     "carbs_g": 44,
     "fat_g": 1.1
+  },
+  "corn": {
+    "calories": 86,
+    "protein_g": 3.3,
+    "carbs_g": 19,
+    "fat_g": 1.4
+  },
+  "mac and cheese": {
+    "calories": 164,
+    "protein_g": 6.4,
+    "carbs_g": 20,
+    "fat_g": 6.6
+  },
+  "cheese": {
+    "calories": 113,
+    "protein_g": 7,
+    "carbs_g": 1,
+    "fat_g": 9
   }
 }
