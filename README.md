@@ -1,6 +1,6 @@
-# 🎤 Voice Food Logger
+# 🎯 FitMe
 
-A voice-powered food logging application with intelligent food parsing and nutrition tracking. Record your meals naturally and get detailed nutritional breakdowns instantly.
+A voice-powered food logging application with intelligent food parsing and nutrition tracking. Record your meals naturally and get detailed nutritional breakdowns instantly. **Now available as "FitMe" - your personal fitness and nutrition companion.**
 
 ## ✨ Features
 
@@ -164,18 +164,20 @@ xcrun simctl launch "iPhone 16" com.eduardolizana.voicefoodlogger.VoiceFoodLogge
 ✅ **AI Food Parsing with Groq**  
 ✅ **Nutrition Database Lookup**  
 ✅ **Daily Logging & Aggregation**  
-✅ **Build System Resolution**  
-✅ **End-to-End Testing**
+✅ **FitMe App Rebranding**  
+✅ **Delete Bug Fixes**  
+✅ **SwiftUI Architecture Fix**
 
-The system is **fully functional** with voice recording, AI processing, and nutrition tracking working seamlessly together.
+The system is **fully functional** with voice recording, AI processing, and nutrition tracking working seamlessly together. **Now branded as FitMe with improved user experience.**
 
-## 📝 Recent Updates
+## 📝 Recent Updates (September 2025)
 
-- **Fixed JSON parsing** with thinking/response tag extraction
-- **Resolved build issues** by using standard Xcode paths
-- **Enhanced error handling** with comprehensive debug logging
-- **Improved UI states** with smooth transitions and feedback
-- **Complete integration testing** verified working end-to-end
+- **🎯 FitMe Rebranding**: Changed app name from VoiceFoodLogger to FitMe
+- **🐛 Critical Delete Fix**: Entries now permanently deleted (legacy entries support)
+- **🔄 SwiftUI Architecture**: Converted ScrollView to List for native swipe actions  
+- **🎨 App Icon Infrastructure**: Set up professional icon system
+- **📱 iPhone Testing**: Successfully deployed and tested on physical device
+- **⚡ Enhanced UI**: Timer-based animated counters with smooth transitions
 
 ## 🤝 Contributing
 

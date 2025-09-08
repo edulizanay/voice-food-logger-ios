@@ -1,120 +1,111 @@
-# 🧹 Voice Food Logger Simplification Plan
+# 🎯 FitMe Development Roadmap
 
-## Current Status: Working on simplify-codebase branch
-
-### Overview
-Systematically removing unused files, dead code, and outdated components while maintaining full functionality. All changes are being made in a safe branch with comprehensive testing between phases.
-
----
-
-## ✅ Phase 1: Safe Deletions (100% Safe - No Functionality Impact)
-
-### 1.1 Remove Empty iOS Test Files
-- [ ] Delete `ios/VoiceFoodLoggerTests/VoiceFoodLoggerTests.swift` (18 lines of empty @Test stubs)
-- [ ] Delete `ios/VoiceFoodLoggerUITests/VoiceFoodLoggerUITests.swift` (42 lines of empty XCUIApplication tests)
-- [ ] Delete `ios/VoiceFoodLoggerUITests/VoiceFoodLoggerUITestsLaunchTests.swift` (empty launch tests)
-
-### 1.2 Remove Broken Backend Test Files
-- [ ] Delete `backend/tests/test_transcription.py` (30 lines - tests deleted transcription.py)
-- [ ] Delete `backend/tests/test_integration.py` (85 lines - tests old integration)
-- [ ] Delete `backend/tests/test_processing.py` (45 lines - incomplete tests)
-- [ ] Delete `backend/tests/test_storage.py` (42 lines - tests deleted storage.py)
-- [ ] Delete `backend/tests/test_nutrition.py` (200 lines - old nutrition tests)
-- [ ] Remove empty `backend/tests/` directory
-
-### 1.3 Remove Build Artifacts
-- [ ] Delete `build/` directory (80MB of temporary build files that shouldn't be in repo)
-
-### 1.4 Remove Outdated Documentation
-- [ ] Delete `shared/docs/project-status.md` (refers to completed "Phase 2")
-- [ ] Delete `ios/CLAUDE.md` (old development notes)
-
-### 1.5 Test Phase 1
-- [ ] **CRITICAL**: Build iOS app and verify it compiles without errors
-- [ ] **CRITICAL**: Run iOS app in simulator and verify dashboard works
-- [ ] **CRITICAL**: Start backend server and verify it starts without import errors
-- [ ] **CRITICAL**: Test full voice recording workflow end-to-end
+## ✅ Recent Achievements (Completed)
+- **FitMe App Rebranding**: Changed app name from VoiceFoodLogger to FitMe
+- **Critical Delete Bug Fix**: Entries now permanently deleted (handles legacy entries without IDs)
+- **SwiftUI Architecture Fix**: Converted ScrollView to List for native swipe actions
+- **App Icon Infrastructure**: Set up proper icon system with user instructions
+- **Enhanced UI/UX**: Timer-based animated counters with smooth transitions
+- **iPhone Testing**: Successfully deployed and tested on physical device
 
 ---
 
-## ⚠️ Phase 2: Remove Unused Code (Medium Risk - Verify No Usage)
+## 🚀 Current Sprint: Enhanced User Experience
 
-### 2.1 Remove Unused iOS API Methods (APIService.swift)
-- [ ] Remove `processManualEntry()` function (lines 73-85) - never called by DashboardView
-- [ ] Remove `getNutritionDatabase()` function (lines 133-138) - never called by DashboardView
-- [ ] Remove `getEntries(for date:)` function (lines 101-106) - only use getTodayEntries
-- [ ] Remove `getDailyTotals(for date:)` function (lines 122-127) - only use getTodayTotals
+### **Priority 1: Immediate Improvements**
 
-### 2.2 Remove Unused iOS Models (Models.swift)
-- [ ] Remove `ManualEntryResponse` struct (lines 80-91) - never instantiated
-- [ ] Remove `NutritionDatabaseResponse` struct (lines 73-78) - never instantiated  
-- [ ] Remove `ManualEntryRequest` struct (lines 102-104) - never used
-- [ ] Remove `NutritionFood` struct (lines 37-41) - not used by dashboard
+#### ✅ **In Progress**
+- [ ] **Professional App Icon**: Create SVG-based FitMe icon design
+- [ ] **App Name Display Fix**: Ensure "FitMe" appears correctly on iPhone home screen
+- [ ] **Better Error Feedback**: Specific error messages for recording failures
+- [ ] **Meal Time Detection**: Auto-categorize entries as breakfast/lunch/dinner/snack
 
-### 2.3 Remove Unused Backend Endpoints (app.py)
-- [ ] Remove `/api/manual-entry` route (~15 lines) - never called by iOS
-- [ ] Remove `/api/nutrition-database` route (~10 lines) - never called by iOS
-- [ ] Remove `/api/entries/<date>` route (~10 lines) - only use today's entries
-- [ ] Remove `/api/daily-totals/<date>` route (~10 lines) - only use today's totals
-
-### 2.4 Test Phase 2
-- [ ] **CRITICAL**: Build and test iOS app functionality
-- [ ] **CRITICAL**: Test voice recording and dashboard updates
-- [ ] **CRITICAL**: Verify all remaining API endpoints work correctly
-- [ ] **CRITICAL**: Check that no broken imports or missing functions exist
+#### 🔄 **Next Up**  
+- [ ] **Loading State Enhancement**: Better processing indicators and user feedback
+- [ ] **Voice Feedback**: Audio confirmations "Logged 300 calories successfully"
+- [ ] **Onboarding Flow**: First-time user experience and microphone permissions guide
 
 ---
 
-## ❗ Phase 3: Remove Unused Views (High Risk - Double Check)
+## 📋 Development Backlog
 
-### 3.1 Verify ContentView and ResultsView Are Truly Unused
-- [ ] **VERIFY**: Search all files for ContentView references (should only find self-references)
-- [ ] **VERIFY**: Search all files for ResultsView references (should only find ContentView + self-references)
-- [ ] **CONFIRM**: App.swift uses DashboardView, not ContentView
+### **Bucket 2: Smart Food Intelligence (1-2 months)**
+- [ ] **Expanded Food Database**: Add 200+ more foods with accurate nutrition data
+- [ ] **Recipe Recognition**: Handle complex dishes "chicken stir fry with vegetables" 
+- [ ] **Correction System**: Easy editing interface for misunderstood foods
+- [ ] **Portion Intelligence**: Better quantity parsing for common descriptors
 
-### 3.2 Remove Unused Views
-- [ ] Remove `ios/VoiceFoodLogger/ContentView.swift` (212 lines - replaced by DashboardView)
-- [ ] Remove `ios/VoiceFoodLogger/ResultsView.swift` (238 lines - integrated into DashboardView)
+### **Bucket 3: Data Analytics & Insights (2-3 months)**
+- [ ] **Progress Dashboard**: Weekly/monthly nutrition trends with charts
+- [ ] **Goal System**: Daily calorie/macro targets with progress tracking
+- [ ] **Smart Insights**: Personalized notifications "You're low on protein today"
+- [ ] **Export Features**: PDF reports, CSV data export for nutritionists
+- [ ] **Historical Analysis**: Long-term eating pattern analysis
 
-### 3.3 Test Phase 3
-- [ ] **CRITICAL**: Build iOS app and verify no compilation errors
-- [ ] **CRITICAL**: Run full app functionality test
-- [ ] **CRITICAL**: Test recording, processing, and dashboard display
-- [ ] **CRITICAL**: Verify all UI components render correctly
+### **Bucket 4: Advanced Features (3-6 months)**
+- [ ] **Photo Integration**: Take pictures of meals for visual context
+- [ ] **Barcode Scanning**: Packaged food recognition via camera
+- [ ] **Apple Health Sync**: Full integration with iOS Health app
+- [ ] **Offline Mode**: Complete functionality without internet connection
+- [ ] **Voice Commands**: "Show me today's calories", "Delete last entry"
 
----
-
-## 🎯 Final Steps
-
-### Commit and Merge
-- [ ] Commit all simplification changes with detailed message
-- [ ] Test one final time in branch
-- [ ] Merge simplify-codebase branch back to main
-- [ ] Delete simplify-codebase branch
-
----
-
-## 📊 Expected Impact
-
-**Files Removed**: ~15 files  
-**Lines Removed**: ~800-1000 lines  
-**Size Reduction**: ~80MB  
-**Functionality**: 100% preserved  
+### **Bucket 5: Platform & Scale (6+ months)**
+- [ ] **Cloud Sync**: Multi-device data synchronization
+- [ ] **User Accounts**: Profile system with personal preferences
+- [ ] **Apple Watch**: Quick voice logging from wrist interface
+- [ ] **Web Dashboard**: Desktop companion for detailed analysis
+- [ ] **Android Version**: Cross-platform expansion
 
 ---
 
-## 🚨 Testing Protocol
+## 🔧 Technical Infrastructure
 
-After each phase:
-1. **iOS Build Test**: `xcodebuild -scheme VoiceFoodLogger -project VoiceFoodLogger.xcodeproj -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.6'`
-2. **iOS Run Test**: Launch app and test voice recording workflow
-3. **Backend Test**: `cd backend && python app.py` (should start without errors)  
-4. **Integration Test**: Record voice → verify dashboard updates with new entry
+### **Testing & Quality Assurance**
+- [ ] **Automated Test Suite**: Unit tests for voice processing, API reliability
+- [ ] **UI Testing**: SwiftUI component testing and user flow validation
+- [ ] **Performance Monitoring**: Voice processing speed and API response times
+- [ ] **Error Tracking**: Comprehensive logging and crash reporting
 
-**STOP AND INVESTIGATE** if any test fails before proceeding to next phase.
+### **Architecture & Security**
+- [ ] **Performance Optimization**: Faster voice processing and API responses
+- [ ] **Data Encryption**: Secure user data storage and transmission
+- [ ] **API Security**: Endpoint authentication and rate limiting
+- [ ] **CI/CD Pipeline**: Automated builds, testing, and deployments
 
 ---
 
-*Working in branch: `simplify-codebase`*  
-*Started: [Current Date]*  
-*Status: Phase 1 in progress*
+## 🎯 Success Metrics
+
+### **User Experience Goals**
+- **Recording Success Rate**: >95% successful voice captures
+- **Processing Speed**: <3 seconds from voice to logged entry
+- **User Retention**: Weekly active usage tracking
+- **Error Recovery**: <1% of sessions with unrecoverable errors
+
+### **Technical Performance**
+- **App Launch Time**: <2 seconds cold start
+- **Memory Usage**: <50MB average during operation
+- **Battery Impact**: Minimal background processing
+- **Network Efficiency**: Optimized API call patterns
+
+---
+
+## 🔄 Development Process
+
+### **Workflow Standards**
+1. **Feature Branches**: All work done in dedicated branches
+2. **Commit & Push**: Every session ends with GitHub sync
+3. **Testing Protocol**: Build → Test → Deploy → Verify cycle
+4. **Documentation**: Update CLAUDE.md and README.md with progress
+
+### **Current Tools & Stack**
+- **iOS**: SwiftUI, AVFoundation, Core Audio
+- **Backend**: Python Flask, JSON file storage
+- **Development**: Xcode, GitHub, Claude Code
+- **Testing**: iPhone 16e physical device, iOS Simulator
+
+---
+
+*Last Updated: September 8, 2025*  
+*Current Status: Enhanced User Experience Sprint*  
+*Next Milestone: Professional app icon and error handling improvements*
