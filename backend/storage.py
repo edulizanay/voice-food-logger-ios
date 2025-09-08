@@ -2,6 +2,7 @@ import json
 import os
 import uuid
 from datetime import datetime
+from meal_detection import detect_meal_time, get_meal_emoji
 
 def _calculate_daily_totals(entries: list) -> dict:
     """Calculate total macros for all entries in a day"""
@@ -50,10 +51,16 @@ def store_food_data(food_items: list, timestamp: datetime = None) -> bool:
     if timestamp is None:
         timestamp = datetime.now()
     
-    # Create entry with unique ID
+    # Detect meal type based on timestamp
+    meal_type = detect_meal_time(timestamp)
+    meal_emoji = get_meal_emoji(meal_type)
+    
+    # Create entry with unique ID and meal type
     entry = {
         "id": str(uuid.uuid4()),
         "timestamp": timestamp.isoformat(),
+        "meal_type": meal_type,
+        "meal_emoji": meal_emoji,
         "items": food_items
     }
     

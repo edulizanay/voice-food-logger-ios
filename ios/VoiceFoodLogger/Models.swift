@@ -32,20 +32,26 @@ struct FoodItem: Codable {
 struct FoodEntry: Codable, Identifiable {
     let id: String
     let timestamp: String
+    let mealType: String?
+    let mealEmoji: String?
     let items: [FoodItem]
     
     enum CodingKeys: String, CodingKey {
         case id, timestamp, items
+        case mealType = "meal_type"
+        case mealEmoji = "meal_emoji"
     }
     
     // Regular initializer for creating entries in code
-    init(id: String, timestamp: String, items: [FoodItem]) {
+    init(id: String, timestamp: String, items: [FoodItem], mealType: String? = nil, mealEmoji: String? = nil) {
         self.id = id
         self.timestamp = timestamp
+        self.mealType = mealType
+        self.mealEmoji = mealEmoji
         self.items = items
     }
     
-    // Custom decoder to handle entries with or without IDs
+    // Custom decoder to handle entries with or without IDs and meal types
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         // Use timestamp as fallback ID for entries without ID
@@ -53,6 +59,8 @@ struct FoodEntry: Codable, Identifiable {
         let timestamp = try container.decode(String.self, forKey: .timestamp)
         self.id = decodedId ?? timestamp
         self.timestamp = timestamp
+        self.mealType = try container.decodeIfPresent(String.self, forKey: .mealType)
+        self.mealEmoji = try container.decodeIfPresent(String.self, forKey: .mealEmoji)
         self.items = try container.decode([FoodItem].self, forKey: .items)
     }
 }

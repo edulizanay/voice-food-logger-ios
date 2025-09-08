@@ -406,17 +406,38 @@ struct EntryCard: View {
         return "Unknown time"
     }
     
+    private var mealTypeDisplay: String {
+        if let mealType = entry.mealType {
+            return mealType.capitalized
+        }
+        return ""
+    }
+    
     private var totalCalories: Int {
         entry.items.compactMap { $0.macros?.calories }.reduce(0, +)
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // Time and total calories
+            // Time, meal type and total calories
             HStack {
-                Text(entryTime)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                HStack(spacing: 4) {
+                    if let mealEmoji = entry.mealEmoji {
+                        Text(mealEmoji)
+                            .font(.caption)
+                    }
+                    
+                    Text(entryTime)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    if !mealTypeDisplay.isEmpty {
+                        Text("• \(mealTypeDisplay)")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .fontWeight(.medium)
+                    }
+                }
                 
                 Spacer()
                 
@@ -494,21 +515,28 @@ struct RecordingSection: View {
                         .font(.body)
                         .foregroundColor(.secondary)
                 }
-            } else if audioRecorder.lastError != nil {
+            } else if let error = audioRecorder.lastError {
                 VStack(spacing: 12) {
                     HStack(spacing: 8) {
-                        Image(systemName: "exclamationmark.triangle.fill")
+                        Image(systemName: audioRecorder.lastErrorType.iconName)
                             .foregroundColor(.orange)
                             .font(.title2)
                         
-                        Text("Recording Failed")
+                        Text("Error")
                             .font(.headline)
                             .foregroundColor(.orange)
                     }
                     
-                    Text("Tap to retry")
-                        .font(.body)
+                    Text(error)
+                        .font(.system(size: 14))
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 20)
+                    
+                    Text(audioRecorder.lastErrorType.suggestedAction)
+                        .font(.system(size: 13))
                         .foregroundColor(.secondary)
+                        .italic()
                 }
             } else {
                 Text("Ready to record your next meal")
@@ -575,7 +603,7 @@ struct RecordingSection: View {
                 } else if audioRecorder.isProcessing {
                     Text("Processing your recording...")
                 } else if audioRecorder.lastError != nil {
-                    Text("Tap to try recording again")
+                    Text(audioRecorder.lastErrorType.suggestedAction)
                 } else {
                     Text("Tap to start recording")
                 }
