@@ -65,41 +65,12 @@ class APIService: ObservableObject {
         return try await performRequest(request: request, responseType: AudioProcessResponse.self)
     }
     
-    // MARK: - Manual Entry
-    
-    /// Process manual text food entry
-    /// - Parameter text: Food description text
-    /// - Returns: Manual entry response with parsed food items
-    func processManualEntry(text: String) async throws -> ManualEntryResponse {
-        let url = URL(string: "\(baseURL)/api/manual-entry")!
-        
-        let requestBody = ManualEntryRequest(text: text)
-        let jsonData = try jsonEncoder.encode(requestBody)
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = jsonData
-        
-        return try await performRequest(request: request, responseType: ManualEntryResponse.self)
-    }
-    
     // MARK: - Entries
     
     /// Get food entries for today
     /// - Returns: Today's food entries
     func getTodayEntries() async throws -> EntriesResponse {
         let url = URL(string: "\(baseURL)/api/entries")!
-        let request = URLRequest(url: url)
-        
-        return try await performRequest(request: request, responseType: EntriesResponse.self)
-    }
-    
-    /// Get food entries for a specific date
-    /// - Parameter date: Date in YYYY-MM-DD format
-    /// - Returns: Food entries for the specified date
-    func getEntries(for date: String) async throws -> EntriesResponse {
-        let url = URL(string: "\(baseURL)/api/entries/\(date)")!
         let request = URLRequest(url: url)
         
         return try await performRequest(request: request, responseType: EntriesResponse.self)
@@ -114,27 +85,6 @@ class APIService: ObservableObject {
         let request = URLRequest(url: url)
         
         return try await performRequest(request: request, responseType: DailyTotalsResponse.self)
-    }
-    
-    /// Get daily macro totals for a specific date
-    /// - Parameter date: Date in YYYY-MM-DD format
-    /// - Returns: Macro totals for the specified date
-    func getDailyTotals(for date: String) async throws -> DailyTotalsResponse {
-        let url = URL(string: "\(baseURL)/api/daily-totals/\(date)")!
-        let request = URLRequest(url: url)
-        
-        return try await performRequest(request: request, responseType: DailyTotalsResponse.self)
-    }
-    
-    // MARK: - Nutrition Database
-    
-    /// Get the nutrition database
-    /// - Returns: Available foods in the nutrition database
-    func getNutritionDatabase() async throws -> NutritionDatabaseResponse {
-        let url = URL(string: "\(baseURL)/api/nutrition-database")!
-        let request = URLRequest(url: url)
-        
-        return try await performRequest(request: request, responseType: NutritionDatabaseResponse.self)
     }
     
     // MARK: - Private Methods

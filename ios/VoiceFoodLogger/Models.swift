@@ -34,11 +34,6 @@ struct FoodEntry: Codable {
     let items: [FoodItem]
 }
 
-/// Represents a food in the nutrition database
-struct NutritionFood: Codable {
-    let name: String
-    let macros: Macros
-}
 
 // MARK: - API Response Models
 
@@ -69,26 +64,6 @@ struct DailyTotalsResponse: APIResponse {
     let totals: Macros
 }
 
-/// Response for nutrition database
-struct NutritionDatabaseResponse: APIResponse {
-    let success: Bool
-    let foods: [NutritionFood]
-    let count: Int
-}
-
-/// Response for manual entry
-struct ManualEntryResponse: APIResponse {
-    let success: Bool
-    let originalText: String
-    let items: [FoodItem]
-    let timestamp: String
-    
-    enum CodingKeys: String, CodingKey {
-        case success
-        case originalText = "original_text"
-        case items, timestamp
-    }
-}
 
 /// Error response
 struct ErrorResponse: APIResponse, Error {
@@ -98,7 +73,3 @@ struct ErrorResponse: APIResponse, Error {
 
 // MARK: - Request Models
 
-/// Request for manual food entry
-struct ManualEntryRequest: Codable {
-    let text: String
-}

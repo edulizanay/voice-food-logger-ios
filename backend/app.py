@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from transcription import transcribe_file
 from processing import process_food_text
-from storage import store_food_data, get_today_entries, get_daily_totals, get_entries_by_date, get_daily_totals_by_date
+from storage import store_food_data, get_today_entries, get_daily_totals
 
 # Load environment variables from .env file
 load_dotenv()
@@ -105,21 +105,6 @@ def get_daily_totals_api():
     return jsonify(totals)
 
 # iOS API endpoints
-@app.route('/api/entries/<date>', methods=['GET'])
-def api_get_entries_by_date(date):
-    """Get food entries for a specific date (YYYY-MM-DD format)"""
-    try:
-        entries = get_entries_by_date(date)
-        return jsonify({
-            'success': True,
-            'date': date,
-            'entries': entries
-        }), 200
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
 
 @app.route('/api/entries', methods=['GET'])
 def api_get_today_entries():
@@ -137,21 +122,6 @@ def api_get_today_entries():
             'error': str(e)
         }), 500
 
-@app.route('/api/daily-totals/<date>', methods=['GET'])
-def api_get_daily_totals_by_date(date):
-    """Get daily macro totals for a specific date (YYYY-MM-DD format)"""
-    try:
-        totals = get_daily_totals_by_date(date)
-        return jsonify({
-            'success': True,
-            'date': date,
-            'totals': totals
-        }), 200
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
 
 @app.route('/api/daily-totals', methods=['GET'])
 def api_get_today_totals():
@@ -169,62 +139,7 @@ def api_get_today_totals():
             'error': str(e)
         }), 500
 
-@app.route('/api/nutrition-database', methods=['GET'])
-def api_get_nutrition_database():
-    """Get available foods in the nutrition database"""
-    try:
-        import json
-        with open('data/nutrition_db.json', 'r') as f:
-            nutrition_db = json.load(f)
-        
-        foods = []
-        for food_name, macros in nutrition_db.items():
-            foods.append({
-                'name': food_name,
-                'macros': macros
-            })
-        
-        return jsonify({
-            'success': True,
-            'foods': foods,
-            'count': len(foods)
-        }), 200
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
 
-@app.route('/api/manual-entry', methods=['POST'])
-def api_manual_entry():
-    """Process a manual text food entry (for keyboard input)"""
-    try:
-        data = request.get_json()
-        if not data or 'text' not in data:
-            return jsonify({
-                'success': False,
-                'error': 'No text provided. Please include "text" field in JSON.'
-            }), 400
-        
-        # Process the text directly (skip transcription)
-        text = data['text']
-        parsed_data = process_food_text(text)
-        
-        # Store the data
-        store_food_data(parsed_data['items'])
-        
-        return jsonify({
-            'success': True,
-            'original_text': text,
-            'items': parsed_data['items'],
-            'timestamp': datetime.now().isoformat()
-        }), 201
-        
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
 
 @app.route('/test_pipeline')
 def test_pipeline():
