@@ -191,3 +191,4 @@ This is a personal food logging project. The codebase demonstrates:
 ---
 
 *Built with ❤️ using SwiftUI, Flask, and Groq AI*
+# Manual deployment trigger Mon Sep  8 20:51:52 CEST 2025
