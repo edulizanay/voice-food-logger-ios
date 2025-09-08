@@ -1,5 +1,6 @@
 import json
 import os
+import uuid
 from datetime import datetime
 
 def _calculate_daily_totals(entries: list) -> dict:
@@ -49,8 +50,9 @@ def store_food_data(food_items: list, timestamp: datetime = None) -> bool:
     if timestamp is None:
         timestamp = datetime.now()
     
-    # Create entry
+    # Create entry with unique ID
     entry = {
+        "id": str(uuid.uuid4()),
         "timestamp": timestamp.isoformat(),
         "items": food_items
     }
@@ -213,6 +215,128 @@ def get_daily_totals_by_date(date: str) -> dict:
             
         except json.JSONDecodeError:
             return {"calories": 0, "protein_g": 0, "carbs_g": 0, "fat_g": 0}
+
+def delete_entry(entry_id: str) -> bool:
+    """
+    Delete a food entry by its ID
+    
+    Args:
+        entry_id: UUID string of the entry to delete
+        
+    Returns:
+        True if deleted successfully, False if entry not found
+    """
+    today = datetime.now()
+    filename = f"logs_{today.strftime('%Y-%m-%d')}.json"
+    filepath = os.path.join('logs', filename)
+    
+    if not os.path.exists(filepath):
+        return False
+    
+    with open(filepath, 'r') as file:
+        try:
+            data = json.load(file)
+            if not isinstance(data, dict) or 'entries' not in data:
+                return False
+                
+            entries = data['entries']
+            # Find and remove entry with matching ID
+            original_count = len(entries)
+            entries = [entry for entry in entries if entry.get('id') != entry_id]
+            
+            if len(entries) == original_count:
+                return False  # Entry not found
+            
+            # Recalculate daily totals
+            daily_totals = _calculate_daily_totals(entries)
+            updated_data = {
+                "entries": entries,
+                "daily_macros": daily_totals
+            }
+            
+            # Save updated data
+            with open(filepath, 'w') as file:
+                json.dump(updated_data, file, indent=2)
+            
+            print(f"Deleted entry with ID {entry_id}")
+            return True
+            
+        except json.JSONDecodeError:
+            return False
+
+def update_entry_quantity(entry_id: str, new_quantity: str) -> bool:
+    """
+    Update the quantity of a food entry by its ID
+    
+    Args:
+        entry_id: UUID string of the entry to update
+        new_quantity: New quantity string (e.g., "200g")
+        
+    Returns:
+        True if updated successfully, False if entry not found
+    """
+    today = datetime.now()
+    filename = f"logs_{today.strftime('%Y-%m-%d')}.json"
+    filepath = os.path.join('logs', filename)
+    
+    if not os.path.exists(filepath):
+        return False
+    
+    with open(filepath, 'r') as file:
+        try:
+            data = json.load(file)
+            if not isinstance(data, dict) or 'entries' not in data:
+                return False
+                
+            entries = data['entries']
+            entry_found = False
+            
+            # Find and update entry with matching ID
+            for entry in entries:
+                if entry.get('id') == entry_id:
+                    if 'items' in entry and len(entry['items']) > 0:
+                        # Update quantity of the first (and typically only) item
+                        entry['items'][0]['quantity'] = new_quantity
+                        entry_found = True
+                        break
+            
+            if not entry_found:
+                return False
+            
+            # Re-process the entry to recalculate macros
+            # Import processing here to avoid circular imports
+            from processing import process_food_text
+            
+            # Create a text representation for reprocessing
+            food_name = entry['items'][0]['food']
+            text_for_processing = f"{new_quantity} of {food_name}"
+            
+            try:
+                # Reprocess to get new macros
+                processed_data = process_food_text(text_for_processing)
+                if processed_data['items']:
+                    # Update the entry with new macros
+                    entry['items'][0]['macros'] = processed_data['items'][0].get('macros')
+            except Exception as e:
+                print(f"Warning: Could not recalculate macros for updated quantity: {e}")
+                # Continue without macro update
+            
+            # Recalculate daily totals
+            daily_totals = _calculate_daily_totals(entries)
+            updated_data = {
+                "entries": entries,
+                "daily_macros": daily_totals
+            }
+            
+            # Save updated data
+            with open(filepath, 'w') as file:
+                json.dump(updated_data, file, indent=2)
+            
+            print(f"Updated entry {entry_id} with new quantity: {new_quantity}")
+            return True
+            
+        except json.JSONDecodeError:
+            return False
 
 if __name__ == "__main__":
     # Test the storage system

@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from transcription import transcribe_file
 from processing import process_food_text
-from storage import store_food_data, get_today_entries, get_daily_totals
+from storage import store_food_data, get_today_entries, get_daily_totals, delete_entry, update_entry_quantity
 
 # Load environment variables from .env file
 load_dotenv()
@@ -139,7 +139,57 @@ def api_get_today_totals():
             'error': str(e)
         }), 500
 
+@app.route('/api/entries/<entry_id>', methods=['DELETE'])
+def api_delete_entry(entry_id):
+    """Delete a food entry by ID"""
+    try:
+        success = delete_entry(entry_id)
+        if success:
+            return jsonify({
+                'success': True,
+                'message': f'Entry {entry_id} deleted successfully'
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Entry not found'
+            }), 404
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
+@app.route('/api/entries/<entry_id>', methods=['PUT'])
+def api_update_entry(entry_id):
+    """Update a food entry's quantity by ID"""
+    try:
+        data = request.get_json()
+        if not data or 'quantity' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'Missing quantity field in request body'
+            }), 400
+        
+        new_quantity = data['quantity']
+        success = update_entry_quantity(entry_id, new_quantity)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': f'Entry {entry_id} updated successfully',
+                'new_quantity': new_quantity
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Entry not found'
+            }), 404
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 @app.route('/test_pipeline')
 def test_pipeline():
