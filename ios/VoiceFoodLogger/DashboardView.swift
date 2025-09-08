@@ -1,5 +1,6 @@
 import SwiftUI
 import AVFoundation
+import UIKit
 
 struct DashboardView: View {
     @StateObject private var audioRecorder = AudioRecorder()
@@ -9,6 +10,18 @@ struct DashboardView: View {
     @State private var todaysTotals: Macros?
     @State private var todaysEntries: [FoodEntry] = []
     @State private var isLoadingData = false
+    
+    // Animated numbers state
+    @State private var animatedCalories: Double = 0
+    @State private var animatedProtein: Double = 0
+    
+    // Counter animation timers
+    @State private var caloriesTimer: Timer?
+    @State private var proteinTimer: Timer?
+    
+    // Edit modal state
+    @State private var selectedEntry: FoodEntry?
+    @State private var showingEditModal = false
     
     // Daily goals (hardcoded as requested)
     private let calorieGoal = 1800
@@ -21,6 +34,8 @@ struct DashboardView: View {
                 // Daily Macros Header
                 DailyMacrosHeaderView(
                     currentTotals: todaysTotals,
+                    animatedCalories: animatedCalories,
+                    animatedProtein: animatedProtein,
                     calorieGoal: calorieGoal,
                     proteinGoal: proteinGoal,
                     isLoading: isLoadingData
@@ -33,7 +48,13 @@ struct DashboardView: View {
                 // Today's Entries
                 TodaysEntriesView(
                     entries: todaysEntries,
-                    isLoading: isLoadingData
+                    isLoading: isLoadingData,
+                    apiService: apiService,
+                    onEntryEdit: { entry in
+                        selectedEntry = entry
+                        showingEditModal = true
+                    },
+                    onDataChange: refreshData
                 )
                 
                 Spacer(minLength: 20)
@@ -50,6 +71,11 @@ struct DashboardView: View {
             .navigationTitle("Food Tracker")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .sheet(isPresented: $showingEditModal) {
+            if let entry = selectedEntry {
+                EditQuantityModal(entry: entry, onUpdate: refreshData)
+            }
+        }
         .alert("Microphone Permission Required", isPresented: $showingPermissionAlert) {
             Button("Settings") {
                 if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
@@ -63,6 +89,11 @@ struct DashboardView: View {
         .onAppear {
             audioRecorder.requestPermission()
             refreshData()
+        }
+        .onDisappear {
+            // Clean up timers
+            caloriesTimer?.invalidate()
+            proteinTimer?.invalidate()
         }
     }
     
@@ -81,6 +112,10 @@ struct DashboardView: View {
                     todaysTotals = totals.totals
                     todaysEntries = entries.entries
                     isLoadingData = false
+                    
+                    // Trigger animated counter updates
+                    startCaloriesAnimation(from: animatedCalories, to: Double(totals.totals.calories))
+                    startProteinAnimation(from: animatedProtein, to: totals.totals.proteinG)
                 }
                 
             } catch {
@@ -91,10 +126,76 @@ struct DashboardView: View {
             }
         }
     }
+    
+    // Progressive counter animation for calories
+    private func startCaloriesAnimation(from startValue: Double, to endValue: Double) {
+        caloriesTimer?.invalidate()
+        
+        guard startValue != endValue else {
+            animatedCalories = endValue
+            return
+        }
+        
+        let startTime = Date()
+        let totalDifference = endValue - startValue
+        let duration: TimeInterval = 1.2
+        
+        caloriesTimer = Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { timerInstance in
+            let elapsed = Date().timeIntervalSince(startTime)
+            let progress = min(elapsed / duration, 1.0)
+            
+            // Ease out curve (fast start, slow finish)
+            let easedProgress = 1.0 - pow(1.0 - progress, 3.0)
+            
+            let currentValue = startValue + (totalDifference * easedProgress)
+            animatedCalories = currentValue
+            
+            // Complete animation
+            if progress >= 1.0 {
+                animatedCalories = endValue
+                timerInstance.invalidate()
+                caloriesTimer = nil
+            }
+        }
+    }
+    
+    // Progressive counter animation for protein
+    private func startProteinAnimation(from startValue: Double, to endValue: Double) {
+        proteinTimer?.invalidate()
+        
+        guard startValue != endValue else {
+            animatedProtein = endValue
+            return
+        }
+        
+        let startTime = Date()
+        let totalDifference = endValue - startValue
+        let duration: TimeInterval = 1.2
+        
+        proteinTimer = Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { timerInstance in
+            let elapsed = Date().timeIntervalSince(startTime)
+            let progress = min(elapsed / duration, 1.0)
+            
+            // Ease out curve (fast start, slow finish)
+            let easedProgress = 1.0 - pow(1.0 - progress, 3.0)
+            
+            let currentValue = startValue + (totalDifference * easedProgress)
+            animatedProtein = currentValue
+            
+            // Complete animation
+            if progress >= 1.0 {
+                animatedProtein = endValue
+                timerInstance.invalidate()
+                proteinTimer = nil
+            }
+        }
+    }
 }
 
 struct DailyMacrosHeaderView: View {
     let currentTotals: Macros?
+    let animatedCalories: Double
+    let animatedProtein: Double
     let calorieGoal: Int
     let proteinGoal: Double
     let isLoading: Bool
@@ -119,19 +220,19 @@ struct DailyMacrosHeaderView: View {
                     // Calories
                     MacroProgressRow(
                         title: "Calories",
-                        current: totals.calories,
+                        current: Int(animatedCalories),
                         goal: calorieGoal,
                         unit: "cal",
-                        color: calorieProgressColor(current: totals.calories, goal: calorieGoal)
+                        color: calorieProgressColor(current: Int(animatedCalories), goal: calorieGoal)
                     )
                     
                     // Protein
                     MacroProgressRow(
                         title: "Protein",
-                        current: totals.proteinG,
+                        current: animatedProtein,
                         goal: proteinGoal,
                         unit: "g",
-                        color: proteinProgressColor(current: totals.proteinG, goal: proteinGoal)
+                        color: proteinProgressColor(current: animatedProtein, goal: proteinGoal)
                     )
                     
                     // Additional macros (smaller text)
@@ -206,6 +307,9 @@ struct MacroProgressRow: View {
 struct TodaysEntriesView: View {
     let entries: [FoodEntry]
     let isLoading: Bool
+    let apiService: APIService
+    let onEntryEdit: (FoodEntry) -> Void
+    let onDataChange: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -245,12 +349,42 @@ struct TodaysEntriesView: View {
             } else {
                 ScrollView {
                     LazyVStack(spacing: 8) {
-                        ForEach(Array(entries.enumerated()), id: \.offset) { index, entry in
+                        ForEach(entries) { entry in
                             EntryCard(entry: entry)
+                                .swipeActions(edge: .trailing) {
+                                    Button("Delete", role: .destructive) {
+                                        // Haptic feedback for delete action
+                                        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                        impactFeedback.impactOccurred()
+                                        deleteEntry(entry)
+                                    }
+                                }
+                                .swipeActions(edge: .leading) {
+                                    Button("Edit") {
+                                        // Haptic feedback for edit action
+                                        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                                        impactFeedback.impactOccurred()
+                                        onEntryEdit(entry)
+                                    }
+                                    .tint(.blue)
+                                }
                         }
                     }
                     .padding(.horizontal, 20)
                 }
+            }
+        }
+    }
+    
+    private func deleteEntry(_ entry: FoodEntry) {
+        Task {
+            do {
+                _ = try await apiService.deleteEntry(entryId: entry.id)
+                await MainActor.run {
+                    onDataChange() // Refresh the data
+                }
+            } catch {
+                print("Error deleting entry: \(error)")
             }
         }
     }

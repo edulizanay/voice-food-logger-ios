@@ -29,9 +29,32 @@ struct FoodItem: Codable {
 }
 
 /// Represents a food entry with timestamp and items
-struct FoodEntry: Codable {
+struct FoodEntry: Codable, Identifiable {
+    let id: String
     let timestamp: String
     let items: [FoodItem]
+    
+    enum CodingKeys: String, CodingKey {
+        case id, timestamp, items
+    }
+    
+    // Regular initializer for creating entries in code
+    init(id: String, timestamp: String, items: [FoodItem]) {
+        self.id = id
+        self.timestamp = timestamp
+        self.items = items
+    }
+    
+    // Custom decoder to handle entries with or without IDs
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        // Use timestamp as fallback ID for entries without ID
+        let decodedId = try container.decodeIfPresent(String.self, forKey: .id)
+        let timestamp = try container.decode(String.self, forKey: .timestamp)
+        self.id = decodedId ?? timestamp
+        self.timestamp = timestamp
+        self.items = try container.decode([FoodItem].self, forKey: .items)
+    }
 }
 
 
@@ -64,6 +87,12 @@ struct DailyTotalsResponse: APIResponse {
     let totals: Macros
 }
 
+
+/// Basic success response
+struct BasicResponse: APIResponse {
+    let success: Bool
+    let message: String?
+}
 
 /// Error response
 struct ErrorResponse: APIResponse, Error {

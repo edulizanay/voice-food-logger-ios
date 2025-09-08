@@ -5,8 +5,8 @@ class APIService: ObservableObject {
     
     // MARK: - Configuration
     
-    /// Base URL for the Flask backend (localhost for development)
-    private let baseURL = "http://localhost:8080"
+    /// Base URL for the Flask backend (Mac IP for device testing)
+    private let baseURL = "http://192.168.1.188:8080"
     
     /// URLSession for making HTTP requests
     private let urlSession: URLSession
@@ -85,6 +85,36 @@ class APIService: ObservableObject {
         let request = URLRequest(url: url)
         
         return try await performRequest(request: request, responseType: DailyTotalsResponse.self)
+    }
+    
+    // MARK: - Entry Management
+    
+    /// Delete a food entry by ID
+    /// - Parameter entryId: The ID of the entry to delete
+    /// - Returns: Success response
+    func deleteEntry(entryId: String) async throws -> APIResponse {
+        let url = URL(string: "\(baseURL)/api/entries/\(entryId)")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        
+        return try await performRequest(request: request, responseType: BasicResponse.self)
+    }
+    
+    /// Update a food entry's quantity
+    /// - Parameters:
+    ///   - entryId: The ID of the entry to update
+    ///   - newQuantity: The new quantity string (e.g., "200g")
+    /// - Returns: Success response
+    func updateEntry(entryId: String, newQuantity: String) async throws -> APIResponse {
+        let url = URL(string: "\(baseURL)/api/entries/\(entryId)")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let requestBody = ["quantity": newQuantity]
+        request.httpBody = try jsonEncoder.encode(requestBody)
+        
+        return try await performRequest(request: request, responseType: BasicResponse.self)
     }
     
     // MARK: - Private Methods
