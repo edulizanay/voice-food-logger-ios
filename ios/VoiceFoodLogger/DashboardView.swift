@@ -347,31 +347,31 @@ struct TodaysEntriesView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 40)
             } else {
-                ScrollView {
-                    LazyVStack(spacing: 8) {
-                        ForEach(entries) { entry in
-                            EntryCard(entry: entry)
-                                .swipeActions(edge: .trailing) {
-                                    Button("Delete", role: .destructive) {
-                                        // Haptic feedback for delete action
-                                        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-                                        impactFeedback.impactOccurred()
-                                        deleteEntry(entry)
-                                    }
+                List {
+                    ForEach(entries) { entry in
+                        EntryCard(entry: entry)
+                            .swipeActions(edge: .trailing) {
+                                Button("Delete", role: .destructive) {
+                                    // Haptic feedback for delete action
+                                    let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                    impactFeedback.impactOccurred()
+                                    deleteEntry(entry)
                                 }
-                                .swipeActions(edge: .leading) {
-                                    Button("Edit") {
-                                        // Haptic feedback for edit action
-                                        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
-                                        impactFeedback.impactOccurred()
-                                        onEntryEdit(entry)
-                                    }
-                                    .tint(.blue)
+                            }
+                            .swipeActions(edge: .leading) {
+                                Button("Edit") {
+                                    // Haptic feedback for edit action
+                                    let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                                    impactFeedback.impactOccurred()
+                                    onEntryEdit(entry)
                                 }
-                        }
+                                .tint(.blue)
+                            }
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets(top: 4, leading: 20, bottom: 4, trailing: 20))
                     }
-                    .padding(.horizontal, 20)
                 }
+                .listStyle(PlainListStyle())
             }
         }
     }
