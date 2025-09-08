@@ -27,6 +27,40 @@ def _load_nutrition_database() -> dict:
         print(f"Warning: Invalid JSON in nutrition database at {db_path}")
         return {}
 
+def _extract_response_content(llm_output: str) -> str:
+    """Extract JSON content from between <response> tags"""
+    print(f"🔍 DEBUG - Raw LLM Output:\n{llm_output}")
+    print(f"🔍 DEBUG - Output length: {len(llm_output)} characters")
+    
+    # Extract content between <response> and </response> tags
+    start_tag = "<response>"
+    end_tag = "</response>"
+    
+    start_index = llm_output.find(start_tag)
+    if start_index == -1:
+        print("❌ DEBUG - No <response> tag found in output")
+        # Fallback: try to find JSON directly
+        start_json = llm_output.find('{')
+        end_json = llm_output.rfind('}') + 1
+        if start_json != -1 and end_json != 0:
+            fallback_json = llm_output[start_json:end_json]
+            print(f"🔄 DEBUG - Using fallback JSON extraction: {fallback_json}")
+            return fallback_json
+        raise ValueError(f"No <response> tags found and no JSON fallback available in: {llm_output}")
+    
+    start_index += len(start_tag)
+    end_index = llm_output.find(end_tag, start_index)
+    
+    if end_index == -1:
+        print("❌ DEBUG - No closing </response> tag found")
+        # Use everything after <response> tag
+        extracted_content = llm_output[start_index:].strip()
+    else:
+        extracted_content = llm_output[start_index:end_index].strip()
+    
+    print(f"✅ DEBUG - Extracted response content:\n{extracted_content}")
+    return extracted_content
+
 def _parse_quantity(quantity_str: str) -> float:
     """Parse quantity string to get numeric value for calculations"""
     # Remove common words and normalize
@@ -133,18 +167,17 @@ def process_food_text(text: str) -> dict:
     
     response_text = completion.choices[0].message.content.strip()
     
-    # Parse JSON from response
+    # Extract JSON content from <response> tags and parse
     try:
-        parsed_data = json.loads(response_text)
-    except json.JSONDecodeError:
-        # Try to extract JSON from response if wrapped in text
-        start = response_text.find('{')
-        end = response_text.rfind('}') + 1
-        if start != -1 and end != 0:
-            json_str = response_text[start:end]
-            parsed_data = json.loads(json_str)
-        else:
-            raise ValueError(f"Could not parse JSON from response: {response_text}")
+        json_content = _extract_response_content(response_text)
+        parsed_data = json.loads(json_content)
+        print(f"✅ DEBUG - Successfully parsed JSON: {parsed_data}")
+    except json.JSONDecodeError as e:
+        print(f"❌ DEBUG - JSON parsing error: {e}")
+        raise ValueError(f"Could not parse JSON from response: {response_text}")
+    except Exception as e:
+        print(f"❌ DEBUG - Response extraction error: {e}")
+        raise ValueError(f"Could not extract response from: {response_text}")
     
     # Add nutrition information to each food item
     if 'items' in parsed_data:

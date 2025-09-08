@@ -1,30 +1,12 @@
-# Voice Food Logger Monorepo Migration
+# CLAUDE.md - Voice Food Logger Project
 
-## Project Overview
-Migrating the existing Flask voice food logger backend into a monorepo architecture with the new iOS app, creating a complete cross-platform food logging system.
+## 🎯 Project Status: FULLY FUNCTIONAL ✅
 
-## Current State Analysis
+The Voice Food Logger is a complete, working monorepo with iOS app and Flask backend integration. All major features are implemented and tested.
 
-### Existing Backend (Flask)
-- **Location**: `~/Documents/GitHub/voice-food-logger/`
-- **Architecture**: Complete voice → transcription → processing → storage pipeline
-- **Key Features**:
-  - Groq Whisper API for transcription
-  - Groq Qwen LLM for intelligent food parsing
-  - 13-food nutrition database with fuzzy matching
-  - Smart unit conversion (grams, cups, scoops, etc.)
-  - Daily aggregation and macro calculations
-  - JSON-based storage with backward compatibility
-  - Web interface with iPhone-style recording
+## 🏗️ Architecture Overview
 
-### Existing iOS App  
-- **Location**: Current directory
-- **Status**: ✅ Working with voice recording functionality
-- **Features**: SwiftUI interface, AVFoundation recording, microphone permissions
-
-## Migration Goals
-
-### 1. Monorepo Structure
+**Monorepo Structure**:
 ```
 VoiceFoodLogger/
 ├── ios/                          # iOS app
@@ -217,4 +199,46 @@ POST /api/manual-entry           # Text-based food entry
 
 ---
 
-*This document will be updated as progress is made on each phase.*
+## 🔧 Build & Run Commands
+
+### Backend (Flask Server)
+```bash
+cd backend
+source venv/bin/activate
+python app.py
+# Runs on http://localhost:8080
+```
+
+### iOS App (Simulator)
+```bash
+cd ios
+# IMPORTANT: Use standard build paths (not custom derivedDataPath)
+xcodebuild -scheme VoiceFoodLogger -project VoiceFoodLogger.xcodeproj \
+  -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.6'
+
+# Install and launch on simulator
+xcrun simctl boot "iPhone 16"
+xcrun simctl install "iPhone 16" "/Users/eduardolizana/Library/Developer/Xcode/DerivedData/VoiceFoodLogger-*/Build/Products/Debug-iphonesimulator/VoiceFoodLogger.app"
+xcrun simctl launch "iPhone 16" com.eduardolizana.voicefoodlogger.VoiceFoodLogger
+```
+
+## ⚠️ Critical Build Notes
+
+1. **NEVER use `-derivedDataPath ./build`** - causes app crashes
+2. **ALWAYS use standard Xcode build paths** for simulator compatibility  
+3. **App bundle must be in**: `/Users/eduardolizana/Library/Developer/Xcode/DerivedData/VoiceFoodLogger-*/`
+
+## 🛠️ Recent Key Fixes
+
+### JSON Parsing Issue ✅ RESOLVED
+**Problem**: Groq LLM returning `<thinking>` tags breaking JSON parsing
+**Solution**: 
+- Updated `parser.yaml` with thinking/response tag examples
+- Added `_extract_response_content()` function in `processing.py`
+- Robust fallback JSON extraction with debug logging
+
+### Build Path Issue ✅ RESOLVED  
+**Problem**: Custom `-derivedDataPath ./build` causing app crashes
+**Solution**: Use standard Xcode build paths only
+
+The Voice Food Logger is **complete and working** end-to-end! 🎉
