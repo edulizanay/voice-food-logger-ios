@@ -8,7 +8,7 @@ import os
 from datetime import datetime
 
 # Add shared directory to path
-sys.path.append('shared')
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))
 
 from supabase_storage import store_food_data
 

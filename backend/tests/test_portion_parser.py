@@ -11,7 +11,7 @@ import sys
 import os
 
 # Add the shared directory to the path for imports
-sys.path.append(os.path.join(os.path.dirname(__file__), 'shared'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))
 
 from processing import process_food_text
 
