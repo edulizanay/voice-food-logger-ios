@@ -9,14 +9,18 @@ load_dotenv()
 
 def _load_prompt() -> str:
     """Load the food parsing prompt from YAML file"""
-    prompt_path = "processing/prompts/parser.yaml"
+    # Get the directory of this file and build absolute path
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    prompt_path = os.path.join(current_dir, "processing", "prompts", "parser.yaml")
     with open(prompt_path, 'r') as file:
         prompts = yaml.safe_load(file)
         return prompts['food_parsing_prompt']
 
 def _load_nutrition_database() -> dict:
     """Load the nutrition database from JSON file"""
-    db_path = "data/nutrition_db.json"
+    # Get the directory of this file and build absolute path
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(current_dir, "data", "nutrition_db.json")
     try:
         with open(db_path, 'r') as file:
             return json.load(file)
