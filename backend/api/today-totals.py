@@ -8,14 +8,8 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))
 
 from storage import get_daily_totals
 
-def handler(request):
+def handler(request, context):
     """Vercel serverless function handler for getting today's macro totals"""
-    if request.method != 'GET':
-        return {
-            'statusCode': 405,
-            'headers': {'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Method not allowed'})
-        }
     
     try:
         totals = get_daily_totals()

@@ -1,10 +1,14 @@
 {
   "version": 2,
-  "functions": {
-    "api/**/*.py": {
-      "runtime": "python@3.9"
+  "builds": [
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb"
+      }
     }
-  },
+  ],
   "routes": [
     {
       "src": "/api/voice-upload",
@@ -22,10 +26,5 @@
       "src": "/api/health",
       "dest": "/api/health.py"
     }
-  ],
-  "build": {
-    "env": {
-      "PYTHONPATH": "/var/task"
-    }
-  }
+  ]
 }
