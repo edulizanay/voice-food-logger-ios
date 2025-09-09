@@ -23,9 +23,6 @@
       "dest": "/api/health.py"
     }
   ],
-  "env": {
-    "GROQ_API_KEY": "@groq_api_key"
-  },
   "build": {
     "env": {
       "PYTHONPATH": "/var/task"
