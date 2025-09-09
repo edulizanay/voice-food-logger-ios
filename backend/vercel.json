@@ -45,6 +45,10 @@
     {
       "src": "/api/test-processing",
       "dest": "/api/test-processing.py"
+    },
+    {
+      "src": "/api/debug-usda",
+      "dest": "/api/debug-usda.py"
     }
   ]
 }
