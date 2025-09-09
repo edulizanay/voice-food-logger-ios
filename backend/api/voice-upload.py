@@ -2,7 +2,10 @@ import os
 import sys
 import json
 import tempfile
+import cgi
+import io
 from datetime import datetime
+from http.server import BaseHTTPRequestHandler
 
 # Add shared directory to path for imports
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))
@@ -11,71 +14,111 @@ from transcription import transcribe_file
 from processing import process_food_text
 from supabase_storage import store_food_data
 
-def handler(request):
-    """Vercel serverless function handler for voice upload"""
-    if request.method != 'POST':
-        return {
-            'statusCode': 405,
-            'headers': {'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Method not allowed'})
-        }
-    
-    try:
-        # Check if audio file was uploaded
-        if 'audio' not in request.files:
-            return {
-                'statusCode': 400,
-                'headers': {'Content-Type': 'application/json'},
-                'body': json.dumps({'error': 'No audio file provided'})
-            }
-        
-        file = request.files['audio']
-        if not file.filename or not allowed_file(file.filename):
-            return {
-                'statusCode': 400,
-                'headers': {'Content-Type': 'application/json'},
-                'body': json.dumps({'error': 'Please select a supported audio file (WAV, WebM, MP3, etc.)'})
-            }
-        
-        # Save uploaded file temporarily
-        filename = secure_filename(file.filename)
-        temp_dir = tempfile.mkdtemp()
-        temp_path = os.path.join(temp_dir, filename)
-        file.save(temp_path)
-        
+class handler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        """Handle POST requests for voice upload"""
         try:
-            # Step 1: Transcribe audio
-            transcription = transcribe_file(temp_path)
+            # Parse multipart form data
+            content_type = self.headers.get('Content-Type', '')
+            if not content_type.startswith('multipart/form-data'):
+                self.send_error_response(400, 'Multipart form data required')
+                return
             
-            # Step 2: Process food description
-            parsed_data = process_food_text(transcription)
+            # Get content length
+            content_length = int(self.headers.get('Content-Length', 0))
+            if content_length == 0:
+                self.send_error_response(400, 'No data received')
+                return
             
-            # Step 3: Store food data
-            store_food_data(parsed_data['items'])
+            # Read the body
+            body = self.rfile.read(content_length)
             
-            # Return success response
-            return {
-                'statusCode': 200,
-                'headers': {'Content-Type': 'application/json'},
-                'body': json.dumps({
+            # Parse multipart data
+            form_data = cgi.FieldStorage(
+                fp=io.BytesIO(body),
+                headers=self.headers,
+                environ={'REQUEST_METHOD': 'POST'}
+            )
+            
+            # Check for audio file
+            if 'audio' not in form_data:
+                self.send_error_response(400, 'No audio file provided')
+                return
+            
+            audio_field = form_data['audio']
+            if not hasattr(audio_field, 'filename') or not audio_field.filename:
+                self.send_error_response(400, 'Invalid audio file')
+                return
+            
+            if not allowed_file(audio_field.filename):
+                self.send_error_response(400, 'Unsupported file format')
+                return
+            
+            # Save uploaded file temporarily
+            filename = secure_filename(audio_field.filename)
+            temp_dir = tempfile.mkdtemp()
+            temp_path = os.path.join(temp_dir, filename)
+            
+            with open(temp_path, 'wb') as f:
+                f.write(audio_field.file.read())
+            
+            try:
+                # Step 1: Transcribe audio
+                transcription = transcribe_file(temp_path)
+                
+                # Step 2: Process food description
+                parsed_data = process_food_text(transcription)
+                
+                # Step 3: Store food data
+                store_food_data(parsed_data['items'])
+                
+                # Return success response
+                response_data = {
                     'success': True,
                     'transcription': transcription,
                     'items': parsed_data['items'],
                     'timestamp': datetime.now().isoformat()
-                })
-            }
-            
-        finally:
-            # Clean up temporary file
-            os.remove(temp_path)
-            os.rmdir(temp_dir)
+                }
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+                self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+                self.end_headers()
+                
+                self.wfile.write(json.dumps(response_data).encode())
+                
+            finally:
+                # Clean up temporary file
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+                if os.path.exists(temp_dir):
+                    os.rmdir(temp_dir)
+        
+        except Exception as e:
+            self.send_error_response(500, str(e))
     
-    except Exception as e:
-        return {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json'},
-            'body': json.dumps({'error': str(e)})
+    def do_OPTIONS(self):
+        """Handle preflight CORS requests"""
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
+    
+    def send_error_response(self, status_code, message):
+        """Send JSON error response"""
+        self.send_response(status_code)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+        
+        error_response = {
+            'success': False,
+            'error': message
         }
+        self.wfile.write(json.dumps(error_response).encode())
 
 def allowed_file(filename):
     """Check if file is a supported audio file"""

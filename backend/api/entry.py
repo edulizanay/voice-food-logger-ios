@@ -23,9 +23,15 @@ class handler(BaseHTTPRequestHandler):
             
             entry_id = entry_id_match.group(1)
             
-            # Delete from Supabase
+            # Delete from Supabase - try session_id first, then id
             supabase = _get_supabase_client()
-            result = supabase.table("food_entries").delete().eq("id", entry_id).execute()
+            
+            # First try to delete by session_id (for grouped entries)
+            result = supabase.table("food_entries").delete().eq("session_id", entry_id).execute()
+            
+            # If no rows deleted by session_id, try by id (for individual entries)
+            if not result.data:
+                result = supabase.table("food_entries").delete().eq("id", entry_id).execute()
             
             if not result.data:
                 self.send_error_response(404, "Entry not found")
