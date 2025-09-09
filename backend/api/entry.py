@@ -15,7 +15,7 @@ class handler(BaseHTTPRequestHandler):
         try:
             # Extract entry ID from path: /api/entry/123 or /api/entries/123
             path = self.path
-            entry_id_match = re.search(r'/api/entr(?:y|ies)/([a-f0-9-]+)', path)
+            entry_id_match = re.search(r'/api/entr(?:y|ies)/([a-f0-9\-]+)', path)
             
             if not entry_id_match:
                 self.send_error_response(400, "Invalid entry ID format")
@@ -59,7 +59,7 @@ class handler(BaseHTTPRequestHandler):
         try:
             # Extract entry ID from path
             path = self.path
-            entry_id_match = re.search(r'/api/entr(?:y|ies)/([a-f0-9-]+)', path)
+            entry_id_match = re.search(r'/api/entr(?:y|ies)/([a-f0-9\-]+)', path)
             
             if not entry_id_match:
                 self.send_error_response(400, "Invalid entry ID format")

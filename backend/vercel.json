@@ -27,7 +27,7 @@
       "dest": "/api/entries.py"
     },
     {
-      "src": "/api/entries/([a-f0-9-]+)",
+      "src": "/api/entries/([a-f0-9\\-]+)",
       "dest": "/api/entry.py"
     },
     {
@@ -37,6 +37,10 @@
     {
       "src": "/api/health",
       "dest": "/api/health.py"
+    },
+    {
+      "src": "/api/test-env",
+      "dest": "/api/test-env.py"
     }
   ]
 }
