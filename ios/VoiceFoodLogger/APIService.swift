@@ -39,7 +39,7 @@ class APIService: ObservableObject {
     /// - Parameter audioURL: Local file URL of the recorded audio
     /// - Returns: Audio processing response with transcription and food items
     func processAudio(audioURL: URL) async throws -> AudioProcessResponse {
-        let url = URL(string: "\(baseURL)/api/process-audio")!
+        let url = URL(string: "\(baseURL)/api/voice-upload")!
         
         // Create multipart form data request
         var request = URLRequest(url: url)

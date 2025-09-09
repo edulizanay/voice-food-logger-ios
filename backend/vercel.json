@@ -23,6 +23,14 @@
       "dest": "/api/today-totals.py"
     },
     {
+      "src": "/api/entries",
+      "dest": "/api/entries.py"
+    },
+    {
+      "src": "/api/daily-totals",
+      "dest": "/api/daily-totals.py"
+    },
+    {
       "src": "/api/health",
       "dest": "/api/health.py"
     }
