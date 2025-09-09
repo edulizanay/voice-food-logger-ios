@@ -7,6 +7,10 @@
 - **App Icon Infrastructure**: Set up proper icon system with user instructions
 - **Enhanced UI/UX**: Timer-based animated counters with smooth transitions
 - **iPhone Testing**: Successfully deployed and tested on physical device
+- **Vercel Global Deployment**: Migrated from local Flask to serverless functions
+- **Supabase Database Integration**: Replaced JSON storage with Postgres database
+- **Production Scaling**: App now handles global users with persistent data storage
+- **Codebase Cleanup**: Removed legacy files and duplicate modules
 
 ---
 
@@ -100,12 +104,15 @@
 
 ### **Current Tools & Stack**
 - **iOS**: SwiftUI, AVFoundation, Core Audio
-- **Backend**: Python Flask, JSON file storage
+- **Backend**: Vercel serverless functions, Python Flask (local dev)
+- **Database**: Supabase Postgres with Row Level Security
+- **AI**: Groq API (Whisper, Qwen 32B)
 - **Development**: Xcode, GitHub, Claude Code
 - **Testing**: iPhone 16e physical device, iOS Simulator
 
 ---
 
-*Last Updated: September 8, 2025*  
+*Last Updated: September 9, 2025*  
 *Current Status: Enhanced User Experience Sprint*  
-*Next Milestone: Professional app icon and error handling improvements*
+*Next Milestone: Professional app icon and error handling improvements*  
+*Recent Major Achievement: Global production deployment with Supabase database integration complete*

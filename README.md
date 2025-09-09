@@ -8,31 +8,38 @@ A voice-powered food logging application with intelligent food parsing and nutri
 - **🧠 AI Food Parsing**: Groq-powered intelligent food item extraction
 - **📊 Nutrition Tracking**: Automatic macro calculation with database lookup
 - **📱 iOS App**: Native SwiftUI interface with real-time feedback
-- **🌐 Flask Backend**: Robust API for audio processing and food analysis
+- **🌐 Serverless Backend**: Vercel-deployed API for global accessibility
+- **🗄️ Supabase Database**: Postgres storage with Row Level Security
 - **📈 Daily Aggregation**: Track daily totals and progress
 
 ## 🏗️ Architecture
 
 ```
 VoiceFoodLogger/
-├── ios/                    # iOS SwiftUI App
+├── voice-food-logger-ios/  # iOS SwiftUI App
 │   ├── VoiceFoodLogger/   # Main app module
 │   │   ├── ContentView.swift      # Main recording interface
-│   │   ├── AudioRecorder.swift    # Audio recording & backend integration
-│   │   ├── APIService.swift       # Flask API communication
+│   │   ├── AudioRecorder.swift    # Audio recording & Vercel integration
+│   │   ├── APIService.swift       # Serverless API communication
 │   │   ├── Models.swift          # Data models (FoodItem, etc.)
 │   │   └── ResultsView.swift     # Results display
 │   └── VoiceFoodLogger.xcodeproj
-├── backend/                # Flask API Server
-│   ├── app.py             # Main Flask application
-│   ├── processing.py      # AI food parsing logic
-│   ├── processing/prompts/
-│   │   └── parser.yaml    # LLM prompts for food parsing
-│   ├── data/
-│   │   └── nutrition_db.json  # Nutrition database
-│   └── logs/              # Daily JSON logs
-└── shared/                # Shared configuration
-    └── config.yaml
+├── backend/                # Serverless API Functions
+│   ├── api/               # Vercel endpoints
+│   │   ├── voice-upload.py       # Audio processing endpoint
+│   │   ├── today-entries.py      # Daily entries retrieval
+│   │   ├── today-totals.py       # Daily totals calculation
+│   │   └── health.py             # Health check endpoint
+│   ├── shared/            # Shared modules
+│   │   ├── transcription.py     # Groq Whisper integration
+│   │   ├── processing.py        # AI food parsing logic
+│   │   ├── meal_detection.py    # Meal categorization
+│   │   ├── supabase_storage.py  # Database operations
+│   │   └── data/nutrition_db.json  # Nutrition database
+│   ├── templates/         # Web interface
+│   │   └── index.html     # Dashboard template
+│   ├── app.py            # Local development server
+│   └── vercel.json       # Deployment configuration
 ```
 
 ## 🚀 Getting Started
@@ -40,10 +47,13 @@ VoiceFoodLogger/
 ### Prerequisites
 
 - **macOS** with Xcode 16+
-- **Python 3.8+**
+- **Python 3.8+** (for local development)
 - **Groq API Key** (for AI processing)
+- **Supabase Account** (for database storage)
 
 ### Backend Setup
+
+The backend is deployed on Vercel and uses Supabase for data storage. For local development:
 
 ```bash
 cd backend
@@ -51,12 +61,21 @@ python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# Add your Groq API key to .env
+# Configure environment variables in .env
 echo "GROQ_API_KEY=your_groq_api_key_here" > .env
+echo "SUPABASE_URL=your_supabase_project_url" >> .env
+echo "SUPABASE_KEY=your_supabase_anon_key" >> .env
 
-# Start the server
+# Start local development server
 python app.py
 ```
+
+### Production Deployment
+
+The app uses:
+- **Vercel**: Global serverless API deployment
+- **Supabase**: Postgres database with Row Level Security
+- **Production API**: `https://voice-food-logger-ios.vercel.app`
 
 ### iOS App Setup
 
@@ -73,12 +92,12 @@ xcrun simctl launch "iPhone 16" com.eduardolizana.voicefoodlogger.VoiceFoodLogge
 
 ## 🎯 Usage
 
-1. **Start the backend server**: `python backend/app.py`
-2. **Launch the iOS app** in simulator or device
-3. **Grant microphone permission** when prompted
-4. **Tap the microphone button** to start recording
-5. **Speak naturally**: "I ate 150 grams of chicken and half a cup of rice"
-6. **View results**: Automatic transcription, parsing, and nutrition calculation
+1. **Launch the iOS app** (production backend is already deployed)
+2. **Grant microphone permission** when prompted
+3. **Tap the microphone button** to start recording
+4. **Speak naturally**: "I ate 150 grams of chicken and half a cup of rice"
+5. **View results**: Automatic transcription, parsing, and nutrition calculation
+6. **Access web dashboard**: Visit the Vercel deployment for web interface
 
 ## 🧠 AI Pipeline
 
@@ -96,9 +115,12 @@ xcrun simctl launch "iPhone 16" com.eduardolizana.voicefoodlogger.VoiceFoodLogge
 - **Structured Output**: JSON extraction with fallback handling
 
 ### Backend Features
-- **CORS-enabled** Flask API for iOS integration
+- **Serverless deployment** on Vercel with global CDN
+- **CORS-enabled** API endpoints for iOS integration
+- **Supabase integration** with session-based entry grouping
 - **Multipart audio upload** handling
 - **Daily aggregation** with automatic macro summation
+- **Row Level Security** for future user authentication
 - **Error handling** with detailed logging
 - **Nutrition database** with partial matching
 
@@ -166,9 +188,12 @@ xcrun simctl launch "iPhone 16" com.eduardolizana.voicefoodlogger.VoiceFoodLogge
 ✅ **Daily Logging & Aggregation**  
 ✅ **FitMe App Rebranding**  
 ✅ **Delete Bug Fixes**  
-✅ **SwiftUI Architecture Fix**
+✅ **SwiftUI Architecture Fix**  
+✅ **Vercel Serverless Deployment**  
+✅ **Supabase Database Integration**  
+✅ **Global Production Scaling**
 
-The system is **fully functional** with voice recording, AI processing, and nutrition tracking working seamlessly together. **Now branded as FitMe with improved user experience.**
+The system is **fully functional** with voice recording, AI processing, and nutrition tracking working seamlessly together. **Now deployed globally with Supabase database and branded as FitMe with improved user experience.**
 
 ## 📝 Recent Updates (September 2025)
 
@@ -178,6 +203,9 @@ The system is **fully functional** with voice recording, AI processing, and nutr
 - **🎨 App Icon Infrastructure**: Set up professional icon system
 - **📱 iPhone Testing**: Successfully deployed and tested on physical device
 - **⚡ Enhanced UI**: Timer-based animated counters with smooth transitions
+- **🌐 Vercel Deployment**: Migrated to serverless functions for global scaling
+- **🗄️ Supabase Integration**: Replaced JSON storage with Postgres database
+- **🧹 Codebase Cleanup**: Removed legacy files and duplicate modules
 
 ## 🤝 Contributing
 
