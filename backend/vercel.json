@@ -41,18 +41,6 @@
     {
       "src": "/api/health",
       "dest": "/api/health.py"
-    },
-    {
-      "src": "/api/test-processing",
-      "dest": "/api/test-processing.py"
-    },
-    {
-      "src": "/api/debug-usda",
-      "dest": "/api/debug-usda.py"
-    },
-    {
-      "src": "/api/debug-processing",
-      "dest": "/api/debug-processing.py"
     }
   ]
 }
