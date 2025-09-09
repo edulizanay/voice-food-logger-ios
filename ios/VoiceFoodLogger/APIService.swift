@@ -100,18 +100,18 @@ class APIService: ObservableObject {
         return try await performRequest(request: request, responseType: BasicResponse.self)
     }
     
-    /// Update a food entry's quantity
+    /// Update individual items within a food entry session
     /// - Parameters:
-    ///   - entryId: The ID of the entry to update
-    ///   - newQuantity: The new quantity string (e.g., "200g")
+    ///   - entryId: The session ID of the entry to update
+    ///   - itemUpdates: Array of item updates with food name and new quantity
     /// - Returns: Success response
-    func updateEntry(entryId: String, newQuantity: String) async throws -> APIResponse {
-        let url = URL(string: "\(baseURL)/api/entries/\(entryId)")!
+    func updateEntryItems(entryId: String, itemUpdates: [[String: String]]) async throws -> APIResponse {
+        let url = URL(string: "\(baseURL)/api/entries/\(entryId)/items")!
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let requestBody = ["quantity": newQuantity]
+        let requestBody = ["items": itemUpdates]
         request.httpBody = try jsonEncoder.encode(requestBody)
         
         return try await performRequest(request: request, responseType: BasicResponse.self)

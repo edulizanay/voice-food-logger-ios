@@ -31,6 +31,10 @@
       "dest": "/api/entry.py"
     },
     {
+      "src": "/api/entries/([a-f0-9\\-]+)/items",
+      "dest": "/api/entry-items.py"
+    },
+    {
       "src": "/api/daily-totals",
       "dest": "/api/daily-totals.py"
     },

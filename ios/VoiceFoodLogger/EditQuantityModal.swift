@@ -5,7 +5,7 @@ struct EditQuantityModal: View {
     @StateObject private var apiService = APIService()
     
     @Environment(\.dismiss) private var dismiss
-    @State private var selectedQuantity: Int = 150
+    @State private var itemQuantities: [String: Int] = [:] // Track quantity per item
     @State private var isUpdating = false
     @State private var showingDeleteConfirmation = false
     
@@ -16,38 +16,48 @@ struct EditQuantityModal: View {
         NavigationView {
             VStack(spacing: 20) {
                 // Header
-                Text("Edit Quantity")
+                Text("Edit Items")
                     .font(.title2)
                     .fontWeight(.semibold)
                     .padding(.top)
                 
-                // Food name
-                if let firstItem = entry.items.first {
-                    Text(firstItem.food.capitalized)
-                        .font(.title3)
-                        .foregroundColor(.secondary)
-                }
-                
-                Spacer()
-                
-                // Picker wheel
-                VStack {
-                    Text("Quantity")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                    
-                    Picker("Quantity", selection: $selectedQuantity) {
-                        ForEach(1...2000, id: \.self) { quantity in
-                            Text("\(quantity)g")
-                                .tag(quantity)
+                // Show all items in the session
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ForEach(Array(entry.items.enumerated()), id: \.offset) { index, item in
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(item.food.capitalized)
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                
+                                // Quantity picker for this item
+                                HStack {
+                                    Text("Quantity:")
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                    
+                                    Picker("Quantity", selection: Binding(
+                                        get: { itemQuantities[item.food] ?? 150 },
+                                        set: { newValue in
+                                            itemQuantities[item.food] = newValue
+                                            updateQuantities()
+                                        }
+                                    )) {
+                                        ForEach(1...2000, id: \.self) { quantity in
+                                            Text("\(quantity)g")
+                                                .tag(quantity)
+                                        }
+                                    }
+                                    .pickerStyle(MenuPickerStyle())
+                                }
+                                
+                                Divider()
+                            }
+                            .padding(.horizontal)
                         }
                     }
-                    .pickerStyle(WheelPickerStyle())
-                    .frame(height: 150)
-                    .onChange(of: selectedQuantity) { _ in
-                        updateQuantity()
-                    }
                 }
+                .frame(maxHeight: 300)
                 
                 Spacer()
                 
@@ -81,7 +91,7 @@ struct EditQuantityModal: View {
             .navigationBarHidden(true)
         }
         .onAppear {
-            setupInitialQuantity()
+            setupInitialQuantities()
         }
         .disabled(isUpdating)
         .overlay {
@@ -94,18 +104,21 @@ struct EditQuantityModal: View {
         }
     }
     
-    private func setupInitialQuantity() {
-        guard let firstItem = entry.items.first else { return }
-        
-        // Extract number from quantity string (e.g., "150g" -> 150)
-        let quantityString = firstItem.quantity
-        let numbers = quantityString.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
-        if let quantity = Int(numbers), quantity >= 1 && quantity <= 2000 {
-            selectedQuantity = quantity
+    private func setupInitialQuantities() {
+        // Set up initial quantities for all items
+        for item in entry.items {
+            // Extract number from quantity string (e.g., "150g" -> 150)
+            let quantityString = item.quantity
+            let numbers = quantityString.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+            if let quantity = Int(numbers), quantity >= 1 && quantity <= 2000 {
+                itemQuantities[item.food] = quantity
+            } else {
+                itemQuantities[item.food] = 150 // Default
+            }
         }
     }
     
-    private func updateQuantity() {
+    private func updateQuantities() {
         guard !isUpdating else { return }
         
         Task {
@@ -114,8 +127,12 @@ struct EditQuantityModal: View {
             }
             
             do {
-                let newQuantity = "\(selectedQuantity)g"
-                _ = try await apiService.updateEntry(entryId: entry.id, newQuantity: newQuantity)
+                // Build array of item updates
+                let itemUpdates = itemQuantities.map { (food, quantity) in
+                    ["food": food, "quantity": "\(quantity)g"]
+                }
+                
+                _ = try await apiService.updateEntryItems(entryId: entry.id, itemUpdates: itemUpdates)
                 
                 await MainActor.run {
                     onUpdate() // Refresh parent view
@@ -124,7 +141,7 @@ struct EditQuantityModal: View {
             } catch {
                 await MainActor.run {
                     isUpdating = false
-                    print("Error updating entry: \(error)")
+                    print("Error updating entry items: \(error)")
                 }
             }
         }

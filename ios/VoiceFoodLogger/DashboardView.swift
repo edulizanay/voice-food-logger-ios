@@ -396,7 +396,7 @@ struct EntryCard: View {
     private var entryTime: String {
         // Parse timestamp and format as time
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS"
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ" // Add Z for timezone
         
         if let date = formatter.date(from: entry.timestamp) {
             let timeFormatter = DateFormatter()
