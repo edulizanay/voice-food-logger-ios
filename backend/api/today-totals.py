@@ -6,7 +6,7 @@ from datetime import datetime
 # Add shared directory to path for imports
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))
 
-from storage import get_daily_totals
+from supabase_storage import get_daily_totals
 
 def handler(request, context):
     """Vercel serverless function handler for getting today's macro totals"""

@@ -9,7 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'shared'))
 
 from transcription import transcribe_file
 from processing import process_food_text
-from storage import store_food_data
+from supabase_storage import store_food_data
 
 def handler(request):
     """Vercel serverless function handler for voice upload"""
