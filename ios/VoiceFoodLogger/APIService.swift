@@ -5,8 +5,8 @@ class APIService: ObservableObject {
     
     // MARK: - Configuration
     
-    /// Base URL for the Flask backend (Mac IP for device testing)
-    private let baseURL = "http://192.168.1.188:8080"
+    /// Base URL for the Vercel serverless backend (global access)
+    private let baseURL = "https://voice-food-logger-ios.vercel.app"
     
     /// URLSession for making HTTP requests
     private let urlSession: URLSession
