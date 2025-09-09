@@ -23,11 +23,60 @@ struct DashboardView: View {
     @State private var selectedEntry: FoodEntry?
     @State private var showingEditModal = false
     
+    // Navigation state
+    @State private var currentPage = 0
+    @State private var showingFirstLaunchHint = false
+    
     // Daily goals (hardcoded as requested)
     private let calorieGoal = 1800
     private let proteinGoal = 160.0
     
     var body: some View {
+        TabView(selection: $currentPage) {
+            // Page 0: Dashboard
+            dashboardContent
+                .tag(0)
+            
+            // Page 1: Charts/Analytics
+            ChartsView()
+                .tag(1)
+        }
+        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+        .overlay(alignment: .bottom) {
+            // Page indicators
+            PageIndicator(currentPage: $currentPage, pageCount: 2)
+                .padding(.bottom, 30)
+        }
+        .sheet(isPresented: $showingEditModal) {
+            if let entry = selectedEntry {
+                EditQuantityModal(entry: entry, onUpdate: refreshData)
+            }
+        }
+        .alert("Microphone Permission Required", isPresented: $showingPermissionAlert) {
+            Button("Settings") {
+                if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(settingsUrl)
+                }
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("Please enable microphone access in Settings to record audio.")
+        }
+        .onAppear {
+            audioRecorder.requestPermission()
+            refreshData()
+            checkFirstLaunch()
+        }
+        .onDisappear {
+            // Clean up timers
+            caloriesTimer?.invalidate()
+            proteinTimer?.invalidate()
+        }
+    }
+    
+    // MARK: - Dashboard Content
+    
+    private var dashboardContent: some View {
         NavigationView {
             VStack(spacing: 0) {
                 
@@ -83,31 +132,26 @@ struct DashboardView: View {
             .navigationTitle("FitMe")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .sheet(isPresented: $showingEditModal) {
-            if let entry = selectedEntry {
-                EditQuantityModal(entry: entry, onUpdate: refreshData)
-            }
-        }
-        .alert("Microphone Permission Required", isPresented: $showingPermissionAlert) {
-            Button("Settings") {
-                if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(settingsUrl)
+    }
+    
+    // MARK: - First Launch Hint
+    
+    private func checkFirstLaunch() {
+        let hasSeenChartsHint = UserDefaults.standard.bool(forKey: "hasSeenChartsHint")
+        if !hasSeenChartsHint {
+            showingFirstLaunchHint = true
+            UserDefaults.standard.set(true, forKey: "hasSeenChartsHint")
+            
+            // Auto-hide hint after 3 seconds
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                withAnimation {
+                    showingFirstLaunchHint = false
                 }
             }
-            Button("Cancel", role: .cancel) { }
-        } message: {
-            Text("Please enable microphone access in Settings to record audio.")
-        }
-        .onAppear {
-            audioRecorder.requestPermission()
-            refreshData()
-        }
-        .onDisappear {
-            // Clean up timers
-            caloriesTimer?.invalidate()
-            proteinTimer?.invalidate()
         }
     }
+    
+    // MARK: - Data Management
     
     private func refreshData() {
         isLoadingData = true
@@ -814,6 +858,30 @@ struct RecordingSection: View {
             
             // Remove all help text
         }
+    }
+}
+
+// MARK: - Page Indicator
+
+struct PageIndicator: View {
+    @Binding var currentPage: Int
+    let pageCount: Int
+    
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(0..<pageCount, id: \.self) { index in
+                Circle()
+                    .fill(index == currentPage ? Color.primary : Color.secondary.opacity(0.4))
+                    .frame(width: 8, height: 8)
+                    .scaleEffect(index == currentPage ? 1.2 : 1.0)
+                    .animation(.easeInOut(duration: 0.2), value: currentPage)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(Color(UIColor.systemBackground).opacity(0.8))
+        .cornerRadius(12)
+        .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
     }
 }
 
