@@ -108,5 +108,162 @@ struct ErrorResponse: APIResponse, Error {
     let error: String
 }
 
+// MARK: - Weight Tracking Models
+
+/// Represents a weight entry
+struct WeightEntry: Codable, Identifiable {
+    let id: Int
+    let weightKg: Double
+    let createdAt: String
+    let notes: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case weightKg = "weight_kg"  
+        case createdAt = "created_at"
+        case notes
+    }
+}
+
+/// Represents user goals for weight and nutrition
+struct UserGoals: Codable {
+    let id: Int?
+    let calorieGoal: Int
+    let proteinGoal: Double
+    let weightGoalKg: Double
+    let createdAt: String?
+    let updatedAt: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case calorieGoal = "calorie_goal"
+        case proteinGoal = "protein_goal"
+        case weightGoalKg = "weight_goal_kg"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+    }
+}
+
+/// Chart data point for visualizations
+struct ChartDataPoint: Identifiable {
+    let id = UUID()
+    let date: Date
+    let value: Double
+    let goalValue: Double?
+}
+
+/// Time period for chart data
+enum TimePeriod: String, CaseIterable {
+    case today = "today"
+    case week = "week"
+    case month = "month"
+    
+    var displayName: String {
+        switch self {
+        case .today: return "Today"
+        case .week: return "This Week"
+        case .month: return "This Month"
+        }
+    }
+}
+
+/// Weight chart data structure
+struct WeightChartData {
+    let weightPoints: [ChartDataPoint]
+    let goalWeight: Double?
+    let period: TimePeriod
+    let isEmpty: Bool
+    
+    static var empty: WeightChartData {
+        WeightChartData(
+            weightPoints: [],
+            goalWeight: nil,
+            period: .week,
+            isEmpty: true
+        )
+    }
+}
+
+/// Calorie chart data structure
+struct CalorieChartData {
+    let caloriePoints: [ChartDataPoint]
+    let goalCalories: Int
+    let period: TimePeriod
+    let isEmpty: Bool
+    
+    static var empty: CalorieChartData {
+        CalorieChartData(
+            caloriePoints: [],
+            goalCalories: 1800,
+            period: .week,
+            isEmpty: true
+        )
+    }
+}
+
+// MARK: - Weight Tracking API Responses
+
+/// Response for weight entries
+struct WeightEntriesResponse: APIResponse {
+    let success: Bool
+    let data: [WeightEntry]
+    let count: Int
+}
+
+/// Response for user goals
+struct UserGoalsResponse: APIResponse {
+    let success: Bool
+    let data: UserGoals
+}
+
+/// Response for weight history
+struct WeightHistoryResponse: APIResponse {
+    let success: Bool
+    let data: [WeightHistoryPoint]
+    let period: String
+    let count: Int
+}
+
+/// Weight history data point
+struct WeightHistoryPoint: Codable {
+    let date: String
+    let weightKg: Double
+    let goalWeightKg: Double?
+    let entryId: Int?
+    
+    enum CodingKeys: String, CodingKey {
+        case date
+        case weightKg = "weight_kg"
+        case goalWeightKg = "goal_weight_kg"
+        case entryId = "entry_id"
+    }
+}
+
+/// Response for calorie history
+struct CalorieHistoryResponse: APIResponse {
+    let success: Bool
+    let data: [CalorieHistoryPoint]
+    let period: String
+    let count: Int
+}
+
+/// Calorie history data point
+struct CalorieHistoryPoint: Codable {
+    let date: String
+    let calories: Int
+    let goalCalories: Int
+    let proteinG: Double
+    let carbsG: Double
+    let fatG: Double
+    
+    enum CodingKeys: String, CodingKey {
+        case date, calories
+        case goalCalories = "goal_calories"
+        case proteinG = "protein_g"
+        case carbsG = "carbs_g"
+        case fatG = "fat_g"
+    }
+}
+
 // MARK: - Request Models
 

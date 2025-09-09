@@ -117,6 +117,170 @@ class APIService: ObservableObject {
         return try await performRequest(request: request, responseType: BasicResponse.self)
     }
     
+    // MARK: - Weight Tracking
+    
+    /// Get user goals (weight target, calorie target, protein target)
+    /// - Returns: Current user goals
+    func getUserGoals() async throws -> UserGoalsResponse {
+        let url = URL(string: "\(baseURL)/api/user-goals")!
+        let request = URLRequest(url: url)
+        
+        return try await performRequest(request: request, responseType: UserGoalsResponse.self)
+    }
+    
+    /// Update user goals
+    /// - Parameter goals: New goals to set
+    /// - Returns: Success response with updated goals
+    func updateUserGoals(_ goals: [String: Any]) async throws -> UserGoalsResponse {
+        let url = URL(string: "\(baseURL)/api/user-goals")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let jsonData = try JSONSerialization.data(withJSONObject: goals)
+        request.httpBody = jsonData
+        
+        return try await performRequest(request: request, responseType: UserGoalsResponse.self)
+    }
+    
+    /// Add a new weight entry
+    /// - Parameter weightKg: Weight in kilograms
+    /// - Returns: Success response
+    func addWeightEntry(weightKg: Double) async throws -> BasicResponse {
+        let url = URL(string: "\(baseURL)/api/weight-entries")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let requestBody = ["weight_kg": weightKg]
+        request.httpBody = try jsonEncoder.encode(requestBody)
+        
+        return try await performRequest(request: request, responseType: BasicResponse.self)
+    }
+    
+    /// Get weight entries within a date range
+    /// - Parameters:
+    ///   - startDate: Start date in YYYY-MM-DD format
+    ///   - endDate: End date in YYYY-MM-DD format
+    /// - Returns: Weight entries response
+    func getWeightEntries(startDate: String? = nil, endDate: String? = nil) async throws -> WeightEntriesResponse {
+        var urlComponents = URLComponents(string: "\(baseURL)/api/weight-entries")!
+        var queryItems: [URLQueryItem] = []
+        
+        if let startDate = startDate {
+            queryItems.append(URLQueryItem(name: "start_date", value: startDate))
+        }
+        if let endDate = endDate {
+            queryItems.append(URLQueryItem(name: "end_date", value: endDate))
+        }
+        
+        if !queryItems.isEmpty {
+            urlComponents.queryItems = queryItems
+        }
+        
+        let request = URLRequest(url: urlComponents.url!)
+        return try await performRequest(request: request, responseType: WeightEntriesResponse.self)
+    }
+    
+    /// Delete a weight entry by ID
+    /// - Parameter entryId: The ID of the weight entry to delete
+    /// - Returns: Success response
+    func deleteWeightEntry(entryId: Int) async throws -> BasicResponse {
+        let url = URL(string: "\(baseURL)/api/weight-entries/\(entryId)")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        
+        return try await performRequest(request: request, responseType: BasicResponse.self)
+    }
+    
+    /// Get weight history for chart display
+    /// - Parameter period: Time period (today, week, month)
+    /// - Returns: Weight history response
+    func getWeightHistory(period: TimePeriod) async throws -> WeightHistoryResponse {
+        let url = URL(string: "\(baseURL)/api/weight-history?period=\(period.rawValue)")!
+        let request = URLRequest(url: url)
+        
+        return try await performRequest(request: request, responseType: WeightHistoryResponse.self)
+    }
+    
+    /// Get calorie history for chart display  
+    /// - Parameter period: Time period (today, week, month)
+    /// - Returns: Calorie history response
+    func getCalorieHistory(period: TimePeriod) async throws -> CalorieHistoryResponse {
+        let url = URL(string: "\(baseURL)/api/calorie-history?period=\(period.rawValue)")!
+        let request = URLRequest(url: url)
+        
+        return try await performRequest(request: request, responseType: CalorieHistoryResponse.self)
+    }
+    
+    /// Get formatted weight chart data
+    /// - Parameter period: Time period for the chart
+    /// - Returns: Weight chart data ready for visualization
+    func getWeightChartData(period: TimePeriod) async throws -> WeightChartData {
+        do {
+            let response = try await getWeightHistory(period: period)
+            
+            // Convert response to chart data points
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            
+            let chartPoints = response.data.compactMap { point -> ChartDataPoint? in
+                guard let date = dateFormatter.date(from: point.date) else { return nil }
+                return ChartDataPoint(
+                    date: date,
+                    value: point.weightKg,
+                    goalValue: point.goalWeightKg
+                )
+            }
+            
+            let goalWeight = response.data.first?.goalWeightKg
+            
+            return WeightChartData(
+                weightPoints: chartPoints,
+                goalWeight: goalWeight,
+                period: period,
+                isEmpty: chartPoints.isEmpty
+            )
+        } catch {
+            // Return empty data on error
+            return WeightChartData.empty
+        }
+    }
+    
+    /// Get formatted calorie chart data
+    /// - Parameter period: Time period for the chart
+    /// - Returns: Calorie chart data ready for visualization
+    func getCalorieChartData(period: TimePeriod) async throws -> CalorieChartData {
+        do {
+            let response = try await getCalorieHistory(period: period)
+            
+            // Convert response to chart data points
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            
+            let chartPoints = response.data.compactMap { point -> ChartDataPoint? in
+                guard let date = dateFormatter.date(from: point.date) else { return nil }
+                return ChartDataPoint(
+                    date: date,
+                    value: Double(point.calories),
+                    goalValue: Double(point.goalCalories)
+                )
+            }
+            
+            let goalCalories = response.data.first?.goalCalories ?? 1800
+            
+            return CalorieChartData(
+                caloriePoints: chartPoints,
+                goalCalories: goalCalories,
+                period: period,
+                isEmpty: chartPoints.isEmpty
+            )
+        } catch {
+            // Return empty data on error
+            return CalorieChartData.empty
+        }
+    }
+    
     // MARK: - Private Methods
     
     /// Perform an HTTP request and decode the response

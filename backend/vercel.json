@@ -41,6 +41,34 @@
     {
       "src": "/api/health",
       "dest": "/api/health.py"
+    },
+    {
+      "src": "/api/weight-entries",
+      "dest": "/api/weight-entries.py"
+    },
+    {
+      "src": "/api/weight-entries/([0-9]+)",
+      "dest": "/api/weight-entries.py"
+    },
+    {
+      "src": "/api/user-goals",
+      "dest": "/api/user-goals.py"
+    },
+    {
+      "src": "/api/weight-history",
+      "dest": "/api/weight-history.py"
+    },
+    {
+      "src": "/api/weight-history/(latest|summary)",
+      "dest": "/api/weight-history.py"
+    },
+    {
+      "src": "/api/calorie-history",
+      "dest": "/api/calorie-history.py"
+    },
+    {
+      "src": "/api/calorie-history/(summary|today)",
+      "dest": "/api/calorie-history.py"
     }
   ]
 }

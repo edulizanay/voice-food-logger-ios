@@ -338,6 +338,159 @@ def update_entry_quantity(entry_id: str, new_quantity: str) -> bool:
         print(f"Error updating entry {entry_id}: {e}")
         return False
 
+def store_weight_entry(weight_kg: float, timestamp: datetime = None) -> bool:
+    """
+    Store weight entry to Supabase database
+    
+    Args:
+        weight_kg: Weight in kilograms
+        timestamp: When the weight was recorded (defaults to now)
+        
+    Returns:
+        True if stored successfully
+        
+    Raises:
+        Exception: If storage fails
+    """
+    if timestamp is None:
+        timestamp = datetime.now()
+    
+    try:
+        supabase = _get_supabase_client()
+        
+        entry_data = {
+            "weight_kg": weight_kg,
+            "created_at": timestamp.isoformat()
+        }
+        
+        result = supabase.table("weight_entries").insert(entry_data).execute()
+        print(f"Stored weight entry: {weight_kg} kg at {timestamp.isoformat()}")
+        return True
+        
+    except Exception as e:
+        print(f"Error storing weight entry: {e}")
+        raise
+
+def get_weight_entries(start_date: str, end_date: str) -> list:
+    """Get weight entries within a date range"""
+    try:
+        supabase = _get_supabase_client()
+        
+        result = supabase.table("weight_entries") \
+            .select("*") \
+            .gte("created_at", f"{start_date}T00:00:00") \
+            .lte("created_at", f"{end_date}T23:59:59") \
+            .order("created_at", desc=False) \
+            .execute()
+        
+        return result.data
+        
+    except Exception as e:
+        print(f"Error retrieving weight entries: {e}")
+        return []
+
+def get_weight_history_by_period(period: str) -> list:
+    """Get weight data for charts by time period"""
+    try:
+        from datetime import timedelta
+        
+        now = datetime.now()
+        
+        if period == "today":
+            start_date = now.date().isoformat()
+            end_date = now.date().isoformat()
+        elif period == "week":
+            start_date = (now - timedelta(days=7)).date().isoformat()
+            end_date = now.date().isoformat()
+        elif period == "month":
+            start_date = (now - timedelta(days=30)).date().isoformat()
+            end_date = now.date().isoformat()
+        else:
+            start_date = (now - timedelta(days=7)).date().isoformat()
+            end_date = now.date().isoformat()
+        
+        return get_weight_entries(start_date, end_date)
+        
+    except Exception as e:
+        print(f"Error retrieving weight history for period {period}: {e}")
+        return []
+
+def get_user_goals() -> dict:
+    """Get current user goals"""
+    try:
+        supabase = _get_supabase_client()
+        
+        result = supabase.table("user_goals") \
+            .select("*") \
+            .order("created_at", desc=True) \
+            .limit(1) \
+            .execute()
+        
+        if result.data:
+            return result.data[0]
+        else:
+            # Return default goals if none exist
+            return {
+                "calorie_goal": 1800,
+                "protein_goal": 160.0,
+                "weight_goal_kg": 70.0
+            }
+            
+    except Exception as e:
+        print(f"Error retrieving user goals: {e}")
+        return {"calorie_goal": 1800, "protein_goal": 160.0, "weight_goal_kg": 70.0}
+
+def update_user_goals(goals: dict) -> bool:
+    """Update user goals"""
+    try:
+        supabase = _get_supabase_client()
+        
+        # Check if goals already exist
+        existing = supabase.table("user_goals").select("id").limit(1).execute()
+        
+        goals_data = {
+            "calorie_goal": goals.get("calorie_goal", 1800),
+            "protein_goal": goals.get("protein_goal", 160.0),
+            "weight_goal_kg": goals.get("weight_goal_kg", 70.0),
+            "updated_at": datetime.now().isoformat()
+        }
+        
+        if existing.data:
+            # Update existing goals
+            goal_id = existing.data[0]['id']
+            result = supabase.table("user_goals").update(goals_data).eq("id", goal_id).execute()
+        else:
+            # Insert new goals
+            goals_data["created_at"] = datetime.now().isoformat()
+            result = supabase.table("user_goals").insert(goals_data).execute()
+        
+        print(f"Updated user goals: {goals_data}")
+        return True
+        
+    except Exception as e:
+        print(f"Error updating user goals: {e}")
+        return False
+
+def delete_weight_entry(entry_id: int) -> bool:
+    """Delete a weight entry by ID"""
+    try:
+        supabase = _get_supabase_client()
+        
+        result = supabase.table("weight_entries") \
+            .delete() \
+            .eq("id", entry_id) \
+            .execute()
+        
+        success = len(result.data) > 0
+        if success:
+            print(f"Deleted weight entry {entry_id}")
+        
+        return success
+        
+    except Exception as e:
+        print(f"Error deleting weight entry {entry_id}: {e}")
+        return False
+
 if __name__ == "__main__":
     # Test the storage system
     test_items = [
