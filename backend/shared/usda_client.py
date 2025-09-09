@@ -91,6 +91,28 @@ class USDAClient:
         # Return raw foods first, then processed
         return raw_foods + processed_foods
     
+    def _filter_by_food_name(self, foods: List[Dict], food_name: str) -> List[Dict]:
+        """
+        Filter search results to only include foods that contain the original food name
+        
+        Args:
+            foods: List of USDA food items from search results
+            food_name: Original food name being searched for
+            
+        Returns:
+            Filtered list of foods that contain the food name
+        """
+        food_name_lower = food_name.lower().strip()
+        filtered_foods = []
+        
+        for food in foods:
+            description = food.get('description', '').lower()
+            # Check if the original food name (or its root) appears in the description
+            if food_name_lower in description:
+                filtered_foods.append(food)
+        
+        return filtered_foods
+    
     def get_nutrition(self, food_name: str, quantity_g: float) -> Dict:
         """
         Get nutrition information for a food item
@@ -110,17 +132,10 @@ class USDAClient:
             for search_term in search_terms:
                 search_results = self.search_food(search_term)
                 if search_results:
-                    # Filter for reasonable calorie ranges to avoid processed foods
-                    for result in search_results:
-                        test_nutrition = self._extract_nutrition(result, 100)  # Test per 100g
-                        calories_per_100g = test_nutrition["calories"]
-                        
-                        # Sanity check: reasonable calorie range for common foods
-                        if 20 <= calories_per_100g <= 600:  # Exclude extreme outliers
-                            best_match = result
-                            break
-                    
-                    if best_match:
+                    # Filter results to only those containing the original food name
+                    filtered_results = self._filter_by_food_name(search_results, food_name)
+                    if filtered_results:
+                        best_match = filtered_results[0]
                         break
             
             if not best_match:

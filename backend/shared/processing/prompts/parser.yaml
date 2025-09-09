@@ -15,6 +15,7 @@ food_parsing_prompt: |
   - Use your training knowledge to estimate typical portion sizes
   - Mark items with "estimated": true when you estimate, "estimated": false when exact
   - Use standardized food names (e.g., "chicken breast" not "chicken")
+  - When context allows, be more specific with food names (e.g., "almonds raw" vs "almonds", "ground beef" vs "beef") but NEVER make up details not mentioned
   
   Portion Estimation Guidelines:
   
