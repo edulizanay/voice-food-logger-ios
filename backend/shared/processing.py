@@ -201,7 +201,7 @@ def process_food_text(text: str) -> dict:
             }
         ],
         temperature=0.1,
-        max_tokens=500
+        max_tokens=1500
     )
     
     response_text = completion.choices[0].message.content.strip()

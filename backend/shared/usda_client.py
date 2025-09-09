@@ -93,14 +93,15 @@ class USDAClient:
     
     def _filter_by_food_name(self, foods: List[Dict], food_name: str) -> List[Dict]:
         """
-        Filter search results to only include foods that contain the original food name
+        Filter search results to only include foods that contain the original food name,
+        with preference for raw/fresh foods over processed ones
         
         Args:
             foods: List of USDA food items from search results
             food_name: Original food name being searched for
             
         Returns:
-            Filtered list of foods that contain the food name
+            Filtered and sorted list of foods that contain the food name
         """
         food_name_lower = food_name.lower().strip()
         filtered_foods = []
@@ -111,7 +112,28 @@ class USDAClient:
             if food_name_lower in description:
                 filtered_foods.append(food)
         
-        return filtered_foods
+        # Sort by preference: raw/fresh foods first, processed foods last
+        def score_food(food):
+            desc = food.get('description', '').lower()
+            score = 0
+            
+            # Prefer raw/fresh foods
+            if 'raw' in desc: 
+                score += 10
+            if 'fresh' in desc:
+                score += 8
+                
+            # Deprioritize processed foods
+            processed_words = ['dehydrated', 'dried', 'powder', 'chips', 'fried', 
+                             'cooked', 'canned', 'frozen', 'prepared']
+            for word in processed_words:
+                if word in desc:
+                    score -= 5
+                    break  # Only penalize once per food
+            
+            return score
+        
+        return sorted(filtered_foods, key=score_food, reverse=True)
     
     def get_nutrition(self, food_name: str, quantity_g: float) -> Dict:
         """
