@@ -27,6 +27,10 @@
       "dest": "/api/entries.py"
     },
     {
+      "src": "/api/entries/([a-f0-9-]+)",
+      "dest": "/api/entry.py"
+    },
+    {
       "src": "/api/daily-totals",
       "dest": "/api/daily-totals.py"
     },
