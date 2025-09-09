@@ -103,23 +103,57 @@ class USDAClient:
             Dictionary with nutrition information
         """
         try:
-            # Search for the food
-            search_results = self.search_food(food_name)
+            # Try multiple search strategies for better results
+            search_terms = self._generate_search_terms(food_name)
+            best_match = None
             
-            if not search_results:
-                print(f"No USDA results found for '{food_name}', falling back to local")
+            for search_term in search_terms:
+                search_results = self.search_food(search_term)
+                if search_results:
+                    # Filter for reasonable calorie ranges to avoid processed foods
+                    for result in search_results:
+                        test_nutrition = self._extract_nutrition(result, 100)  # Test per 100g
+                        calories_per_100g = test_nutrition["calories"]
+                        
+                        # Sanity check: reasonable calorie range for common foods
+                        if 20 <= calories_per_100g <= 600:  # Exclude extreme outliers
+                            best_match = result
+                            break
+                    
+                    if best_match:
+                        break
+            
+            if not best_match:
+                print(f"No suitable USDA results found for '{food_name}', falling back to local")
                 return self._fallback_to_local(food_name, quantity_g)
-            
-            # Use the best match (first result)
-            best_match = search_results[0]
             
             # Extract and scale nutrition
             nutrition = self._extract_nutrition(best_match, quantity_g)
+            print(f"Selected: {best_match['description']} ({nutrition['calories']} cal per {quantity_g}g)")
             return nutrition
             
         except Exception as e:
             print(f"USDA nutrition lookup failed for '{food_name}': {e}")
             return self._fallback_to_local(food_name, quantity_g)
+    
+    def _generate_search_terms(self, food_name: str) -> List[str]:
+        """Generate multiple search terms for better food matching"""
+        food_name = food_name.lower().strip()
+        
+        # Common food mappings to better search terms
+        search_mappings = {
+            'rice': ['rice white cooked', 'rice cooked', 'rice'],
+            'chicken': ['chicken breast raw', 'chicken raw', 'chicken'],
+            'chicken breast': ['chicken breast raw', 'chicken breast', 'chicken'],
+            'almonds': ['almonds raw', 'almonds', 'nuts almonds'],
+            'beef': ['beef raw', 'ground beef', 'beef'],
+            'pasta': ['pasta cooked', 'macaroni cooked', 'pasta'],
+            'bread': ['bread white', 'bread whole wheat', 'bread'],
+            'milk': ['milk whole', 'milk 2%', 'milk'],
+        }
+        
+        # Return specific search terms if we have them, otherwise use original
+        return search_mappings.get(food_name, [food_name])
     
     def _extract_nutrition(self, food_data: Dict, quantity_g: float) -> Dict:
         """
