@@ -37,10 +37,6 @@
     {
       "src": "/api/health",
       "dest": "/api/health.py"
-    },
-    {
-      "src": "/api/test-env",
-      "dest": "/api/test-env.py"
     }
   ]
 }
