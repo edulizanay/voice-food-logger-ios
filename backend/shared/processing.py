@@ -115,19 +115,53 @@ def _calculate_macros(nutrition_per_100g: dict, quantity_str: str) -> dict:
     }
 
 def _lookup_nutrition(food_name: str, quantity: str) -> dict:
-    """Look up nutrition information for a food item"""
+    """
+    Look up nutrition information for a food item
+    First tries USDA API, then falls back to local database
+    """
+    # First, try USDA API
+    try:
+        from usda_client import USDAClient, parse_quantity_to_grams
+        
+        # Convert quantity string to grams for USDA API
+        quantity_g = parse_quantity_to_grams(quantity)
+        
+        # Get nutrition from USDA
+        usda_client = USDAClient()
+        usda_nutrition = usda_client.get_nutrition(food_name, quantity_g)
+        
+        # If USDA returned valid data, use it
+        if usda_nutrition and usda_nutrition.get("source") == "usda":
+            print(f"✅ USDA nutrition found for '{food_name}' ({quantity})")
+            return usda_nutrition
+        
+        print(f"⚠️ USDA lookup failed for '{food_name}', trying local database...")
+        
+    except Exception as e:
+        print(f"❌ USDA API error for '{food_name}': {e}")
+        print(f"Falling back to local database...")
+    
+    # Fallback to local database
+    return _lookup_local_nutrition(food_name, quantity)
+
+def _lookup_local_nutrition(food_name: str, quantity: str) -> dict:
+    """Look up nutrition from local database (original implementation)"""
     nutrition_db = _load_nutrition_database()
     
     # Try exact match first
     food_key = food_name.lower().strip()
     if food_key in nutrition_db:
-        return _calculate_macros(nutrition_db[food_key], quantity)
+        result = _calculate_macros(nutrition_db[food_key], quantity)
+        result["source"] = "local_database"
+        return result
     
     # Try partial matching
     for db_food in nutrition_db:
         if food_key in db_food or db_food in food_key:
             print(f"Partial match found: '{food_name}' -> '{db_food}'")
-            return _calculate_macros(nutrition_db[db_food], quantity)
+            result = _calculate_macros(nutrition_db[db_food], quantity)
+            result["source"] = "local_database"
+            return result
     
     # No match found
     print(f"Warning: No nutritional data found for '{food_name}' (quantity: {quantity})")
@@ -135,7 +169,8 @@ def _lookup_nutrition(food_name: str, quantity: str) -> dict:
         "calories": 0,
         "protein_g": 0,
         "carbs_g": 0,
-        "fat_g": 0
+        "fat_g": 0,
+        "source": "not_found"
     }
 
 def process_food_text(text: str) -> dict:
