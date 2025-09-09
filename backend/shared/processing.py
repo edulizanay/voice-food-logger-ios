@@ -181,7 +181,29 @@ def process_food_text(text: str) -> dict:
         raise ValueError(f"Could not parse JSON from response: {response_text}")
     except Exception as e:
         print(f"❌ DEBUG - Response extraction error: {e}")
-        raise ValueError(f"Could not extract response from: {response_text}")
+        # Log parsing error for review (simplified version for now)
+        print(f"🔍 PARSER_ERROR - Input: {text}")
+        print(f"🔍 PARSER_ERROR - LLM Response: {response_text[:500]}...")
+        print(f"🔍 PARSER_ERROR - Error: {e}")
+        
+        # Fallback: return simple structure
+        return {
+            "items": [
+                {
+                    "food": text,
+                    "quantity": "1 serving",
+                    "estimated": True,
+                    "unit": "serving",
+                    "macros": {
+                        "calories": 0,
+                        "protein_g": 0,
+                        "carbs_g": 0,
+                        "fat_g": 0
+                    }
+                }
+            ],
+            "error": "Parser failed - used fallback"
+        }
     
     # Add nutrition information to each food item
     if 'items' in parsed_data:

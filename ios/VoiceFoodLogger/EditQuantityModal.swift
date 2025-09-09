@@ -5,12 +5,31 @@ struct EditQuantityModal: View {
     @StateObject private var apiService = APIService()
     
     @Environment(\.dismiss) private var dismiss
-    @State private var itemQuantities: [String: Int] = [:] // Track quantity per item
+    @State private var itemQuantities: [String: Int] = [:]
     @State private var isUpdating = false
     @State private var showingDeleteConfirmation = false
     
     // Callback to refresh the parent view
     let onUpdate: () -> Void
+    
+    // Initialize itemQuantities immediately to prevent blank modal on first launch
+    init(entry: FoodEntry, onUpdate: @escaping () -> Void) {
+        self.entry = entry
+        self.onUpdate = onUpdate
+        
+        // Pre-populate itemQuantities before UI renders
+        var initialQuantities: [String: Int] = [:]
+        for item in entry.items {
+            let quantityString = item.quantity
+            let numbers = quantityString.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+            if let quantity = Int(numbers), quantity >= 1 && quantity <= 2000 {
+                initialQuantities[item.food] = quantity
+            } else {
+                initialQuantities[item.food] = 150
+            }
+        }
+        self._itemQuantities = State(initialValue: initialQuantities)
+    }
     
     var body: some View {
         NavigationView {
@@ -90,9 +109,6 @@ struct EditQuantityModal: View {
             .padding()
             .navigationBarHidden(true)
         }
-        .onAppear {
-            setupInitialQuantities()
-        }
         .disabled(isUpdating)
         .overlay {
             if isUpdating {
@@ -100,20 +116,6 @@ struct EditQuantityModal: View {
                     .ignoresSafeArea()
                 ProgressView()
                     .scaleEffect(1.5)
-            }
-        }
-    }
-    
-    private func setupInitialQuantities() {
-        // Set up initial quantities for all items
-        for item in entry.items {
-            // Extract number from quantity string (e.g., "150g" -> 150)
-            let quantityString = item.quantity
-            let numbers = quantityString.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
-            if let quantity = Int(numbers), quantity >= 1 && quantity <= 2000 {
-                itemQuantities[item.food] = quantity
-            } else {
-                itemQuantities[item.food] = 150 // Default
             }
         }
     }
