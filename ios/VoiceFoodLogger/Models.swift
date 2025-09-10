@@ -145,11 +145,15 @@ struct UserGoals: Codable {
 }
 
 /// Chart data point for visualizations
-struct ChartDataPoint: Identifiable {
+struct ChartDataPoint: Identifiable, Equatable {
     let id = UUID()
     let date: Date
     let value: Double
     let goalValue: Double?
+    
+    static func == (lhs: ChartDataPoint, rhs: ChartDataPoint) -> Bool {
+        return lhs.id == rhs.id
+    }
 }
 
 /// Time period for chart data

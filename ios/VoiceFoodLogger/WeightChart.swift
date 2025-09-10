@@ -60,7 +60,7 @@ struct WeightChart: View {
                     .foregroundStyle(Color.blue.opacity(0.2))
                 }
             }
-            .chartAngleSelection(value: .constant(nil))
+            .chartAngleSelection(value: .constant(nil as Double?))
             .chartBackground { chartProxy in
                 GeometryReader { geometry in
                     Rectangle()
@@ -75,7 +75,7 @@ struct WeightChart: View {
                 AxisMarks(position: .leading) { _ in
                     AxisValueLabel()
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
                         .foregroundStyle(Color.gray.opacity(0.3))
                 }
@@ -84,7 +84,7 @@ struct WeightChart: View {
                 AxisMarks(position: .bottom, values: .stride(by: axisStride)) { _ in
                     AxisValueLabel(format: .dateTime.month(.abbreviated).day())
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
             }
             .frame(height: 160)
@@ -127,7 +127,7 @@ struct WeightChart: View {
             // Period indicator
             Text(data.period.displayName)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
                 .background(Color.gray.opacity(0.1))
@@ -149,7 +149,7 @@ struct WeightChart: View {
             if !isAtGoal {
                 Text("\(abs(difference), specifier: "%.1f") kg")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
         }
     }
@@ -168,7 +168,7 @@ struct WeightChart: View {
             
             Text("Tap the + button to log your first weight entry")
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -182,13 +182,13 @@ struct WeightChart: View {
         VStack(spacing: 6) {
             Text(point.date, format: .dateTime.weekday(.wide).month().day())
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
             
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Weight")
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     Text("\(point.value, specifier: "%.1f") kg")
                         .font(.subheadline)
                         .fontWeight(.medium)
@@ -199,7 +199,7 @@ struct WeightChart: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Goal")
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         Text("\(goalValue, specifier: "%.1f") kg")
                             .font(.subheadline)
                             .fontWeight(.medium)

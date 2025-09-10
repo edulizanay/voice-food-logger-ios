@@ -224,13 +224,18 @@ class APIService: ObservableObject {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd"
             
-            let chartPoints = response.data.compactMap { point -> ChartDataPoint? in
+            var chartPoints = response.data.compactMap { point -> ChartDataPoint? in
                 guard let date = dateFormatter.date(from: point.date) else { return nil }
                 return ChartDataPoint(
                     date: date,
                     value: point.weightKg,
                     goalValue: point.goalWeightKg
                 )
+            }
+            
+            // For month view, calculate weekly averages to reduce chart complexity
+            if period == .month && chartPoints.count > 7 {
+                chartPoints = calculateWeeklyAverages(from: chartPoints)
             }
             
             let goalWeight = response.data.first?.goalWeightKg
@@ -258,13 +263,18 @@ class APIService: ObservableObject {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd"
             
-            let chartPoints = response.data.compactMap { point -> ChartDataPoint? in
+            var chartPoints = response.data.compactMap { point -> ChartDataPoint? in
                 guard let date = dateFormatter.date(from: point.date) else { return nil }
                 return ChartDataPoint(
                     date: date,
                     value: Double(point.calories),
                     goalValue: Double(point.goalCalories)
                 )
+            }
+            
+            // For month view, calculate weekly averages to reduce chart complexity
+            if period == .month && chartPoints.count > 7 {
+                chartPoints = calculateWeeklyAverages(from: chartPoints)
             }
             
             let goalCalories = response.data.first?.goalCalories ?? 1800
@@ -279,6 +289,48 @@ class APIService: ObservableObject {
             // Return empty data on error
             return CalorieChartData.empty
         }
+    }
+    
+    // MARK: - Helper Methods
+    
+    /// Calculate weekly averages from daily data points for better month view visualization
+    /// - Parameter dataPoints: Array of daily chart data points
+    /// - Returns: Array of weekly averaged chart data points
+    private func calculateWeeklyAverages(from dataPoints: [ChartDataPoint]) -> [ChartDataPoint] {
+        let sortedPoints = dataPoints.sorted { $0.date < $1.date }
+        guard !sortedPoints.isEmpty else { return [] }
+        
+        let calendar = Calendar.current
+        var weeklyData: [Date: (values: [Double], goalValues: [Double?], count: Int)] = [:]
+        
+        // Group data by week
+        for point in sortedPoints {
+            let weekStart = calendar.dateInterval(of: .weekOfYear, for: point.date)?.start ?? point.date
+            
+            if weeklyData[weekStart] == nil {
+                weeklyData[weekStart] = (values: [], goalValues: [], count: 0)
+            }
+            
+            weeklyData[weekStart]?.values.append(point.value)
+            weeklyData[weekStart]?.goalValues.append(point.goalValue)
+            weeklyData[weekStart]?.count += 1
+        }
+        
+        // Calculate averages for each week
+        let weeklyAverages = weeklyData.map { (weekStart, data) -> ChartDataPoint in
+            let averageValue = data.values.reduce(0, +) / Double(data.values.count)
+            
+            let nonNilGoalValues = data.goalValues.compactMap { $0 }
+            let averageGoalValue = nonNilGoalValues.isEmpty ? nil : nonNilGoalValues.reduce(0, +) / Double(nonNilGoalValues.count)
+            
+            return ChartDataPoint(
+                date: weekStart,
+                value: averageValue,
+                goalValue: averageGoalValue
+            )
+        }
+        
+        return weeklyAverages.sorted { $0.date < $1.date }
     }
     
     // MARK: - Private Methods

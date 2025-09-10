@@ -70,7 +70,7 @@ struct CalorieChart: View {
                     .foregroundStyle(calorieColor(for: selectedPoint.value).opacity(0.2))
                 }
             }
-            .chartAngleSelection(value: .constant(nil))
+            .chartAngleSelection(value: .constant(nil as Double?))
             .chartBackground { chartProxy in
                 GeometryReader { geometry in
                     Rectangle()
@@ -87,7 +87,7 @@ struct CalorieChart: View {
                         if let calories = value.as(Double.self) {
                             Text("\(Int(calories))")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
                     }
                     AxisGridLine(stroke: StrokeStyle(lineWidth: 0.5))
@@ -98,7 +98,7 @@ struct CalorieChart: View {
                 AxisMarks(position: .bottom, values: .stride(by: axisStride)) { _ in
                     AxisValueLabel(format: .dateTime.month(.abbreviated).day())
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                 }
             }
             .frame(height: 160)
@@ -131,7 +131,7 @@ struct CalorieChart: View {
                         
                         Text("cal")
                             .font(.subheadline)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         
                         calorieProgressIndicator(current: Int(latestCalories.value), goal: data.goalCalories)
                     }
@@ -143,7 +143,7 @@ struct CalorieChart: View {
             // Period indicator
             Text(data.period.displayName)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
                 .background(Color.gray.opacity(0.1))
@@ -178,7 +178,7 @@ struct CalorieChart: View {
                     .foregroundColor(.green)
                 Text("\(remaining) left")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             } else if remaining == 0 {
                 Image(systemName: "target")
                     .font(.caption)
@@ -211,7 +211,7 @@ struct CalorieChart: View {
             
             Text("Start logging food to see your calorie intake")
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -225,13 +225,13 @@ struct CalorieChart: View {
         VStack(spacing: 6) {
             Text(point.date, format: .dateTime.weekday(.wide).month().day())
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
             
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Intake")
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     HStack(spacing: 4) {
                         Text("\(Int(point.value))")
                             .font(.subheadline)
@@ -239,7 +239,7 @@ struct CalorieChart: View {
                             .foregroundColor(calorieColor(for: point.value))
                         Text("cal")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 
@@ -247,7 +247,7 @@ struct CalorieChart: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Goal")
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .foregroundStyle(.secondary)
                         HStack(spacing: 4) {
                             Text("\(Int(goalValue))")
                                 .font(.subheadline)
@@ -255,7 +255,7 @@ struct CalorieChart: View {
                                 .foregroundColor(.red)
                             Text("cal")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -264,7 +264,7 @@ struct CalorieChart: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Progress")
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundStyle(.secondary)
                     let percentage = (point.goalValue != nil) ? (point.value / point.goalValue! * 100) : 0
                     Text("\(Int(percentage))%")
                         .font(.subheadline)
