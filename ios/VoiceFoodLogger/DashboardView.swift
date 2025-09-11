@@ -47,6 +47,18 @@ struct DashboardView: View {
             PageIndicator(currentPage: $currentPage, pageCount: 2)
                 .padding(.bottom, 30)
         }
+        .overlay(alignment: .topTrailing) {
+            // Floating microphone button (only show on dashboard page)
+            if currentPage == 0 {
+                CompactFloatingMicButton(
+                    audioRecorder: audioRecorder,
+                    showingPermissionAlert: $showingPermissionAlert,
+                    onRecordingComplete: refreshData
+                )
+                .padding(.top, 20)
+                .padding(.trailing, 20)
+            }
+        }
         .sheet(isPresented: $showingEditModal) {
             if let entry = selectedEntry {
                 EditQuantityModal(entry: entry, onUpdate: refreshData)
@@ -120,14 +132,8 @@ struct DashboardView: View {
                     }
                 }
                 
-                // Recording Section (compact)
-                CompactRecordingSection(
-                    audioRecorder: audioRecorder,
-                    showingPermissionAlert: $showingPermissionAlert,
-                    onRecordingComplete: refreshData
-                )
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
+                // Additional bottom space
+                Spacer(minLength: 20)
             }
             .navigationTitle("FitMe")
             .navigationBarTitleDisplayMode(.inline)
@@ -477,10 +483,10 @@ struct MacrosOnlyView: View {
     
     var body: some View {
         VStack(spacing: 18) {
-            // Macros Display (larger size)
+            // Macros Display with hierarchy
             if let totals = currentTotals {
                 VStack(spacing: 16) {
-                    // Calories (larger)
+                    // Calories - PROMINENT display
                     MacroProgressRow(
                         title: "Calories",
                         current: Int(animatedCalories),
@@ -488,30 +494,46 @@ struct MacrosOnlyView: View {
                         unit: "cal",
                         color: calorieProgressColor(current: Int(animatedCalories), goal: calorieGoal)
                     )
-                    .font(.title3)
+                    .font(.title2)  // Larger font for prominence
+                    .fontWeight(.semibold)  // Bold for prominence
                     
-                    // Protein (larger)
-                    MacroProgressRow(
-                        title: "Protein",
-                        current: animatedProtein,
-                        goal: proteinGoal,
-                        unit: "g",
-                        color: proteinProgressColor(current: animatedProtein, goal: proteinGoal)
-                    )
-                    .font(.title3)
-                    
-                    // Additional macros (larger text)
+                    // Secondary macros in smaller, grouped format
                     HStack(spacing: 24) {
-                        Text("Carbs: \(totals.carbsG, specifier: "%.1f")g")
-                            .font(.body)
-                            .foregroundColor(.secondary)
+                        // Protein (smaller)
+                        VStack(spacing: 4) {
+                            Text("Protein")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text("\(animatedProtein, specifier: "%.1f")g")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
                         
                         Spacer()
                         
-                        Text("Fat: \(totals.fatG, specifier: "%.1f")g")
-                            .font(.body)
-                            .foregroundColor(.secondary)
+                        // Carbs (smaller)
+                        VStack(spacing: 4) {
+                            Text("Carbs")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text("\(totals.carbsG, specifier: "%.1f")g")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
+                        
+                        Spacer()
+                        
+                        // Fat (smaller)
+                        VStack(spacing: 4) {
+                            Text("Fat")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text("\(totals.fatG, specifier: "%.1f")g")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                        }
                     }
+                    .padding(.top, 8)
                 }
             } else if !isLoading {
                 Text("No entries yet today")
@@ -857,6 +879,99 @@ struct RecordingSection: View {
             }
             
             // Remove all help text
+        }
+    }
+}
+
+struct CompactFloatingMicButton: View {
+    @ObservedObject var audioRecorder: AudioRecorder
+    @Binding var showingPermissionAlert: Bool
+    let onRecordingComplete: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 6) {
+            // Minimal status indicator (only show when actively recording/processing)
+            if audioRecorder.isRecording {
+                HStack(spacing: 3) {
+                    Circle()
+                        .fill(Color.red)
+                        .frame(width: 4, height: 4)
+                        .scaleEffect(audioRecorder.isRecording ? 1.2 : 1.0)
+                        .animation(.easeInOut(duration: 0.5).repeatForever(), value: audioRecorder.isRecording)
+                    
+                    Text(audioRecorder.formatTime(audioRecorder.recordingTime))
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .foregroundColor(.red)
+                }
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(Color.white.opacity(0.9))
+                .cornerRadius(8)
+                .shadow(radius: 2)
+            } else if audioRecorder.isProcessing {
+                HStack(spacing: 3) {
+                    ProgressView()
+                        .scaleEffect(0.5)
+                    Text("...")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(.blue)
+                }
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(Color.white.opacity(0.9))
+                .cornerRadius(8)
+                .shadow(radius: 2)
+            }
+            
+            // Compact Record Button (60% of original size: 80px -> 48px)
+            Button(action: {
+                if audioRecorder.hasPermission {
+                    if audioRecorder.isRecording {
+                        audioRecorder.stopRecording()
+                    } else if audioRecorder.lastError != nil {
+                        audioRecorder.clearError()
+                        audioRecorder.startRecording()
+                    } else {
+                        audioRecorder.startRecording()
+                    }
+                } else {
+                    showingPermissionAlert = true
+                }
+            }) {
+                ZStack {
+                    Circle()
+                        .fill(audioRecorder.isRecording ? Color.red : Color.blue)
+                        .frame(width: 48, height: 48)  // 60% of 80px
+                        .shadow(color: audioRecorder.isRecording ? .red.opacity(0.4) : .blue.opacity(0.4), radius: 4, x: 0, y: 2)
+                    
+                    if audioRecorder.isRecording {
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(Color.white)
+                            .frame(width: 12, height: 12)  // 60% of 20px
+                    } else if audioRecorder.isProcessing {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(0.6)  // 60% scale
+                    } else {
+                        Image(systemName: "mic.fill")
+                            .font(.system(size: 16.8))  // 60% of 28px
+                            .foregroundColor(.white)
+                    }
+                }
+            }
+            .disabled(audioRecorder.isProcessing)
+            .scaleEffect(audioRecorder.isRecording ? 1.1 : 1.0)
+            .animation(.easeInOut(duration: 0.2), value: audioRecorder.isRecording)
+            .opacity(audioRecorder.isProcessing ? 0.7 : 1.0)
+            .onChange(of: audioRecorder.lastTranscription) { _, transcription in
+                if !transcription.isEmpty && !audioRecorder.isProcessing {
+                    onRecordingComplete()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        audioRecorder.lastTranscription = ""
+                        audioRecorder.lastFoodItems = []
+                    }
+                }
+            }
         }
     }
 }
